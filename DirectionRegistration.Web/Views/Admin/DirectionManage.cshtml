@@ -1,0 +1,45 @@
+﻿@model DirectionRegistration.Models.DirectionViewModel
+<div class="container-fluid">    
+    @{
+        AjaxOptions addOptions = new AjaxOptions()
+        {
+            HttpMethod = "POST",
+            Url = @Url.Action("DirectionAdd", "Admin"),
+            LoadingElementId = "loading",
+            UpdateTargetId = "directions"
+        };
+    }
+    @using (Ajax.BeginForm(addOptions))
+    {
+        @Html.ValidationSummary()
+        <div class="form-group">
+            <div class="col-sm-12">
+                <label for="title" class="control-label">方向名称：</label>
+            </div>
+            <div class="col-sm-8">
+                <div class="text-danger">
+                    @Html.ValidationMessageFor(m => m.Title)
+                </div>
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control input" })
+            </div>
+            <div class="col-sm-4">
+                <input type="submit" value="添加" class="btn-success btn" />
+                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+            </div>
+        </div>
+    }
+    <div class="row">
+        <table class="table table-striped col-md-9">
+            <thead>
+                <tr>
+                    <th>方向名称</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="directions">
+                @Html.Action("GetDirections", "Admin")
+            </tbody>
+        </table>
+    </div>
+</div>
+

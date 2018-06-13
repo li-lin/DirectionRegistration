@@ -1,0 +1,18 @@
+﻿<div class="container-fluid">
+    @using (Ajax.BeginForm(new AjaxOptions() { HttpMethod = "POST", Url = Url.Action("Setting", "Admin"), UpdateTargetId = "display" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">           
+            <div class="col-sm-12">
+                <label for="deadline" class="control-label">志愿填报截止日期（年-月-日）：</label>
+            </div>
+            <div class="col-sm-6">
+                @Html.TextBox("deadline", null, new { @class = "input form-control" })
+            </div>
+            <div class="col-sm-6">
+                <input type="submit" value="确定" class="btn-success btn" />
+                <span id="display" class="text-success"></span>
+            </div>
+        </div>
+    }
+</div>

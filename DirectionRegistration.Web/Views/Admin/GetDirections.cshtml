@@ -1,0 +1,12 @@
+﻿@using DirectionRegistration.Models
+@model IList<DirectionViewModel>
+@foreach (DirectionViewModel d in Model)
+{
+    <tr>
+        <td class="col-md-8">@d.Title</td>
+        <td class="col-md-4">@Ajax.ActionLink("删除", "DirectionDel",
+        new { Id = d.Id },
+new AjaxOptions() { UpdateTargetId = "directions", LoadingElementId = "loading", Confirm="确定要删除吗？"},
+        new { @class = "btn btn-success" })</td>
+    </tr>
+}
