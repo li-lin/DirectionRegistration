@@ -117,6 +117,7 @@ namespace DirectionRegistration.Web.Controllers
                         Student s = new Student();
                         s.Number = dr["学号"].ToString();
                         s.Name = dr["姓名"].ToString();
+                        s.Gender = dr["性别"].ToString();
                         s.Major = dr["专业名称"].ToString();
                         s.Password = "123456";
                         //判断导入学生信息是否与数据库中重复。
@@ -136,8 +137,8 @@ namespace DirectionRegistration.Web.Controllers
         private bool checkStudentExist(Student student)
         {
             bool r = false;
-            Student ss = this.db.Students.SingleOrDefault(s => s.Number == student.Number);
-            if (ss != null) r = true;
+            int ss = this.db.Students.Count(s=>s.Number == student.Number);
+            if (ss != 0) r = true;
             return r;
         }
 
@@ -186,6 +187,7 @@ namespace DirectionRegistration.Web.Controllers
             return File(path, "application/vnd.ms-excel", path.Substring(path.LastIndexOf("\\")));
         }
 
+        //设置截止日期
         public ActionResult Setting()
         {
             string currentAdmin = Session["admin"] as string;
@@ -194,7 +196,8 @@ namespace DirectionRegistration.Web.Controllers
                 return RedirectToAction("Login", "Home");
             }
 
-            return PartialView();
+            DateTime deadline = db.ServerConfigurations.FirstOrDefault().Deadline;
+            return PartialView($"{deadline.Year}-{deadline.Month}-{deadline.Day}");
         }
         [HttpPost]
         public ActionResult Setting(string deadline)
@@ -207,9 +210,12 @@ namespace DirectionRegistration.Web.Controllers
 
             DateTime deadlineDt = DateTime.Now;
             bool b = DateTime.TryParse(deadline, out deadlineDt);
-            if (b)
+            var dl = db.ServerConfigurations.FirstOrDefault();
+            if (b && dl != null)
             {
-                ConfigurationManager.AppSettings.Set("Deadline", deadline);
+                dl.Deadline = deadlineDt;
+                db.SaveChanges();
+
                 return Json("设置成功");
             }
             return Json("设置失败");
