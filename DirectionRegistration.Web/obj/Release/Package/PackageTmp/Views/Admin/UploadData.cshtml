@@ -1,0 +1,52 @@
+﻿<div class="container-fluid">
+    @using (Html.BeginForm("UploadData", "Admin", FormMethod.Post, new { id = "formUpload", enctype = "multipart/form-data" })) 
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <div class="col-sm-12">
+                <p class="text-info"><b>注意：</b>Excel工作表名必须命名为“学生名单”。</p>
+            </div>
+            <div class="col-sm-12">
+                <label for="files" class="control-label">学生数据文件（EXCEL）：</label>
+            </div>
+            <div class="col-sm-6">
+                <input id="uploadInput" type="file" name="files" accept="application/vnd.ms-excel" class="form-control btn" />
+            </div>
+            <div class="col-sm-6">
+                <input type="submit" value="导入" class="btn-success btn" />
+                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        $("form#formUpload input:submit").click(function () {
+            if ($('#uploadInput').val()) {
+                $("form#formUpload").ajaxSubmit({
+                    url: $(this).attr("action"),
+                    type: "post",
+                    beforeSubmit:function(){
+                        $('#loading').show();
+                    },
+                    success: function (data) {
+                        $('#loading').hide();                       
+                        if (data.code == "101") {
+                            alert(data.msg);
+                            window.location.href = "@Url.Action("Index", "Admin", new { ssid = Guid.NewGuid().ToString() })";
+                        } else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function (aa) {
+                        alert(aa);
+                    }
+                });
+            } else {
+                alert('请选择上传数据！');
+            }
+            return false;            
+        });        
+    });
+    
+</script>

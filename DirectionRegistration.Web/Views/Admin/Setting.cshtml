@@ -1,7 +1,7 @@
 ﻿@model System.String
 
 <div class="container-fluid">
-    @using (Ajax.BeginForm(new AjaxOptions() { HttpMethod = "POST", Url = Url.Action("Setting", "Admin"), UpdateTargetId = "display" }))
+    @using (Ajax.BeginForm(new AjaxOptions() { HttpMethod = "POST", Url = Url.Action("Setting", "Admin"),OnSuccess="onSuccess" }))
     {
         @Html.AntiForgeryToken()
         <div class="form-group">           
@@ -13,8 +13,19 @@
             </div>
             <div class="col-sm-6">
                 <input type="submit" value="确定" class="btn-success btn" />
-                <span id="display" class="text-success"></span>
+                <span id="display"></span>
             </div>
         </div>
     }
 </div>
+
+<script>
+    function onSuccess(d) {
+        var disp = $('#display');
+        if (d.code == 0) {
+            disp.html(d.data).addClass('text-success').removeClass('text-danger');
+        } else if (d.code == 1) {
+            disp.html(d.data).addClass('text-danger').removeClass('text-success');
+        }
+    }
+</script>

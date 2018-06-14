@@ -1,0 +1,18 @@
+﻿@using DirectionRegistration.Models
+@model IList<CourseViewModel>
+@foreach (CourseViewModel d in Model)
+{
+    <tr>
+        <td class="col-md-8">@d.CourseName</td>
+        <td class="col-md-4">
+            @Ajax.ActionLink("删除", "Delete","Course",
+new { Id = d.Id },
+new AjaxOptions() { UpdateTargetId = "courses", LoadingElementId = "loading", Confirm="确定要删除吗？"},
+new { @class = "btn btn-success" })
+            @Ajax.ActionLink("删除", "DeleteCourse","Course",
+new { Id = d.Id },
+new AjaxOptions() { UpdateTargetId = "courses", LoadingElementId = "loading", Confirm="确定要删除吗？"},
+new { @class = "btn btn-success" })
+        </td>
+</tr>
+}

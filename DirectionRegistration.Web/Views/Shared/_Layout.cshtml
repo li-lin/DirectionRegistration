@@ -24,6 +24,7 @@
                     @if (Session["admin"] != null && Session["admin"].ToString() != string.Empty)
                     {
                         <li>@Html.ActionLink("管理面板", "Index", "Admin")</li>
+                        <li>@Html.ActionLink("课程设置", "Index", "Course")</li>
                         <li>@Html.ActionLink("修改密码", "ChangePassword", "Home")</li>
                         <li>@Html.ActionLink("退出", "Quit", "Home")</li>
                     }

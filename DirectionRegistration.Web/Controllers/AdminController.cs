@@ -141,7 +141,8 @@ namespace DirectionRegistration.Web.Controllers
             if (ss != 0) r = true;
             return r;
         }
-
+         
+        //下载学生志愿填报情况（Excel）
         public ActionResult DownloadData()
         {
             string currentAdmin = Session["admin"] as string;
@@ -196,17 +197,28 @@ namespace DirectionRegistration.Web.Controllers
                 return RedirectToAction("Login", "Home");
             }
 
-            DateTime deadline = db.ServerConfigurations.FirstOrDefault().Deadline;
-            return PartialView($"{deadline.Year}-{deadline.Month}-{deadline.Day}");
+            var config = db.ServerConfigurations.FirstOrDefault();
+            string deadlineStr = null;
+            if (config != null)
+            {
+                DateTime deadline = config.Deadline;
+                deadlineStr = $"{deadline.Year}-{deadline.Month}-{deadline.Day}";
+            }
+            else
+            {
+                deadlineStr = "0000-00-00";
+            }
+            return PartialView("Setting", deadlineStr);
         }
+
         [HttpPost]
         public ActionResult Setting(string deadline)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
+            //string currentAdmin = Session["admin"] as string;
+            //if (string.IsNullOrEmpty(currentAdmin))
+            //{
+            //    return RedirectToAction("Login", "Home");
+            //}
 
             DateTime deadlineDt = DateTime.Now;
             bool b = DateTime.TryParse(deadline, out deadlineDt);
@@ -216,9 +228,9 @@ namespace DirectionRegistration.Web.Controllers
                 dl.Deadline = deadlineDt;
                 db.SaveChanges();
 
-                return Json("设置成功");
+                return Json(new { code = 0, data = "设置成功" });
             }
-            return Json("设置失败");
+            return Json(new { code = 1, data = "设置失败" });
         }
 
         public ActionResult DirectionManage()

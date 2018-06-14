@@ -1,0 +1,131 @@
+﻿@using DirectionRegistration.Models
+@using PagedList.Mvc;
+@model PagedList.IPagedList<RegistrationViewModel>
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<h2>管理面板 - [@Session["admin"].ToString()]</h2>
+
+<div class="btn-group btn-group-lg" role="group">
+    @Html.ActionLink("导入", "UploadData", null, new { id = "btn-import", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
+    @Html.ActionLink("导出", "DownloadData", null, new { id="btn-export", @class = "btn btn-success" })
+    @Html.ActionLink("方向", "DirectionManage", null, new { id="btn-direction",@class="btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
+    @Html.ActionLink("管理员", "AdminManage", null, new { id = "btn-admins", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
+    @Html.ActionLink("设置", "Setting", null, new { id = "btn-setting", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
+</div>
+<div style="height:10px;clear:both;"></div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>学号</th>
+            <th>姓名</th>
+            <th>专业</th>
+            <th>第一志愿</th>
+            <th>第二志愿</th>
+            <th>第三志愿</th>
+            @*<th>操作</th>*@
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Number)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Major)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstSelection)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SecondSelection)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ThirdSelection)
+                </td>
+                @*<td>
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group btn-group-sm" role="group">
+                            @Html.ActionLink("详情", "Detail", new { id = item.Id }, new { @class = "btn btn-default" })
+                            @Html.ActionLink("删除", "Delete", new { id = item.Id }, new { @class = "btn btn-default" })
+                        </div>
+                    </div>
+                </td>*@
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    第@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)页-共 @Model.PageCount 页
+    @Html.PagedListPager(Model,
+    page => Url.Action("Index", "Admin",
+        new
+        {
+            page = page
+        }))
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+               <!--modal body-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+<script src="~/Scripts/jquery.form.js"></script>
+<script>
+    $(document).ready(function () {
+        var whichModal = "";
+        $('#btn-import').click(function () {
+            whichModal = "import";
+        });
+        $('#btn-direction').click(function () {
+            whichModal = "direction";
+        });
+        $('#btn-setting').click(function () {
+            whichModal = "setting";
+        });
+        $('#btn-admins').click(function () {
+            whichModal = "admins";
+        });
+        $("#myModal").on("show.bs.modal", function (e) {
+            if (whichModal == "import") {
+                $('div.modal').find('.modal-title').text('导入学生数据');
+                $(this).find(".modal-body").empty().load('@Url.Action("UploadData")');
+            } else if (whichModal == "direction") {
+                $('div.modal').find('.modal-title').text('方向管理');
+                $(this).find(".modal-body").empty().load('@Url.Action("DirectionManage")');
+            } else if (whichModal == "setting") {
+                $('div.modal').find('.modal-title').text('参数设置');
+                $(this).find(".modal-body").empty().load('@Url.Action("Setting")');
+            } else if (whichModal == "admins") {
+                alert(whichModal);
+                $('div.modal').find('.modal-title').text('管理员配置');
+                $(this).find(".modal-body").empty().load('@Url.Action("AdminManage")');
+            } else {
+                $(this).modal('close');
+            }
+        });
+
+    });
+</script>
+}

@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>四川大学锦城学院-计算机科学与软件工程系-方向志愿填报平台</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style type="text/css">
+        body{
+            padding-top:50px;
+            font-size:16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">                
+                @Html.ActionLink("计科系方向志愿填报平台", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    @if (Session["admin"] != null && Session["admin"].ToString() != string.Empty)
+                    {
+                        <li>@Html.ActionLink("管理面板", "Index", "Admin")</li>
+                        <li>@Html.ActionLink("修改密码", "ChangePassword", "Home")</li>
+                        <li>@Html.ActionLink("退出", "Quit", "Home")</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink("填报", "Index", "Home")</li>
+                        if (Session["currStu"] != null && Session["currStu"].ToString() != string.Empty)
+                        {
+                            <li>@Html.ActionLink("修改密码", "ChangePassword", "Home")</li>
+                            <li>@Html.ActionLink("退出", "Quit", "Home")</li>
+                        }
+                        else
+                        {
+                            <li>@Html.ActionLink("登录", "Login", "Home")</li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        @RenderBody()
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var path = location.pathname;
+            var navs = $('ul.navbar-nav li');
+            for (var i = 0; i < navs.length; i++) {
+                if ($(navs[i]).find('a').attr('href') == path) {
+                    $(navs[i]).addClass('active');
+                } else {
+                    $(navs[i]).removeClass('active');
+                }
+            }
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

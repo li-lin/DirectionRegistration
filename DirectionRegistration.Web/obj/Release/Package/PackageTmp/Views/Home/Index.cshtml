@@ -1,0 +1,117 @@
+﻿@model DirectionRegistration.Models.IndexViewModel
+@using DirectionRegistration.Repository.Entities
+@{
+    ViewBag.Title = "Index";
+}
+@{
+    Func<string, List<SelectListItem>> getDirections = (level) =>
+    {
+        var directionListItems = new List<SelectListItem>();
+        directionListItems.Add(
+            new SelectListItem()
+            {
+                Selected = true,
+                Text = level,
+                Value = "0"
+            }
+       );
+        var directions = ViewBag.Directions as List<Direction>;
+        if (directions != null)
+        {
+            directions.ForEach(d =>{
+                directionListItems.Add(new SelectListItem()
+                {
+                    Selected = false,
+                    Text = d.Title,
+                    Value = d.Id.ToString()
+                });
+            });
+        }
+        return directionListItems;
+    };
+}
+<div class="alert alert-danger" style="display:none;" id="my-alert">
+    <button class="close" type="button">&times;</button>
+    <strong></strong>
+</div>
+<div class="page-header">
+    <h2>方向填报 - [@Model.Name : @Model.Number]</h2>
+</div>
+<div class="row">
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "col-sm-6 col-sm-offset-3 panel panel-body" }))
+    {
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.Id)    
+        <div class="form-group">          
+            <div class="col-sm-12">  
+                @Html.Label("第一志愿")
+            </div>
+            <div class="col-sm-12">                
+                @Html.DropDownListFor(m => m.FirstId,
+                getDirections("请选择"), new { @class = "form-control input-lg" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                @Html.Label("第二志愿")
+            </div>
+            <div class="col-sm-12">
+                @Html.DropDownListFor(m => m.SecondId,
+          getDirections("请选择"), new { @class = "form-control input-lg" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                @Html.Label("第三志愿")
+            </div>
+            <div class="col-sm-12">
+                @Html.DropDownListFor(m => m.ThirdId,
+          getDirections("请选择"), new { @class = "form-control input-lg" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+            @{
+                if ((bool)ViewBag.IsOverTime) {
+                    <button type="button" class="btn btn-primary btn-block btn-lg disabled">保存（填报结束）</button> 
+                } else { 
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">保存</button>
+                }
+             }
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <p class="text-success text-center">@ViewBag.Info</p>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(':submit').click(function () {
+                var result = false;
+                var fs = $('select#FirstId').val();
+                var cs = $('select#SecondId').val();
+                var ts = $('select#ThirdId').val();
+                if (fs == 0 || cs==0 || ts==0) {                   
+                    myAlert('请填报完整！');
+                } else if (cs == fs || ts == cs || ts == fs) {
+                    myAlert('请选择三个不同的志愿！');
+                } else {
+                    result = true;
+                }
+                return result;
+            });
+            $('#my-alert .close').click(function () {
+                $('#my-alert').slideUp();
+            })
+        });
+        function myAlert(info) {
+            $('#my-alert strong').text(info);
+            $('#my-alert').slideDown();
+        }
+    </script>
+}

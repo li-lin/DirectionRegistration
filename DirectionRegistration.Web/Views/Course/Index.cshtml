@@ -1,0 +1,54 @@
+﻿@model DirectionRegistration.Models.CourseViewModel
+@{
+    ViewBag.Title = "课程管理";
+}
+<div class="alert alert-danger" style="display:none;" id="my-alert">
+    <button class="close" type="button">&times;</button>
+    <strong></strong>
+</div>
+<div class="page-header">
+    <h3>课程管理</h3>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">添加课程</h3>
+    </div>
+    <div class="panel-body">
+        @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
+        {
+            <div class="form-group col-sm-4">
+                <label class="sr-only" for="courseName">课程名</label>
+                @Html.TextBoxFor(model => model.CourseName, new { @class = "form-control", placeholder = "课程名" })
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">添加</button>
+                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+            </div>
+        }
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">课程列表</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>课程名</th>
+                    <th>操作</th>
+                </tr>
+            </thead> 
+            <tbody id="courses">
+                @Html.Action("GetCourses", "Course")
+            </tbody>
+        </table>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+}
