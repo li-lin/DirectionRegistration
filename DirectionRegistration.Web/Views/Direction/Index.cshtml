@@ -1,24 +1,31 @@
-﻿@model DirectionRegistration.Models.CourseViewModel
+﻿@using DirectionRegistration.Models
+@model DirectionRegistration.Models.DirectionViewModel
+
 @{
-    ViewBag.Title = "课程管理";
+    ViewBag.Title = "方向管理";
 }
+
 <div class="alert alert-danger" style="display:none;" id="my-alert">
     <button class="close" type="button">&times;</button>
     <strong></strong>
 </div>
 <div class="page-header">
-    <h3>课程管理</h3>
+    <h3>方向管理</h3>
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">添加课程</h3>
+        <h3 class="panel-title">添加方向</h3>
     </div>
     <div class="panel-body">
         @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAddSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
         {
             <div class="form-group col-sm-4">
-                <label class="sr-only" for="courseName">课程名</label>
-                @Html.TextBoxFor(model => model.CourseName, new { @class = "form-control", placeholder = "课程名" })
+                <label class="sr-only" for="courseName">方向名</label>
+                @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "方向名" })
+            </div>
+            <div class="form-group col-sm-4">
+                <label class="sr-only" for="courseName">方向负责人</label>
+                @Html.DropDownListFor(model => model.TeacherId, ViewBag.Teachers as List<SelectListItem>, new { @class = "form-control" })                
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-success">添加</button>
@@ -29,18 +36,19 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">课程列表</h3>
+        <h3 class="panel-title">方向列表</h3>
     </div>
     <div class="panel-body">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>课程名</th>
+                    <th>方向名</th>
+                    <th>负责人</th>
                     <th>操作</th>
                 </tr>
             </thead>
-            <tbody id="courses">
-                @Html.Action("GetCourses", "Course")
+            <tbody id="directions">
+                @Html.Action("GetDirections", "Direction")
             </tbody>
         </table>
     </div>
@@ -74,8 +82,8 @@
 
         function showModify(id) {
             $("#myModal").on("show.bs.modal", function (e) {
-                $('div.modal').find('.modal-title').text('修改课程名称');
-                $(this).find(".modal-body").empty().load('@Url.Action("Modify","Course")' + '/' + id);
+                $('div.modal').find('.modal-title').text('修改方向');
+                $(this).find(".modal-body").empty().load('@Url.Action("Modify","Direction")' + '/' + id);
             });
         }
 
@@ -84,7 +92,7 @@
                 myAlert(d.data);
             } else {
                 myAlert('添加成功');
-                $('#courses').html(d);
+                $('#directions').html(d);
             }
         }
         function onDelSuccess(d) {
@@ -92,7 +100,7 @@
                 myAlert(d.data);
             } else {
                 myAlert('删除成功');
-                $('#courses').html(d);
+                $('#directions').html(d);
             }
         }
         function onModifySuccess(d) {
@@ -101,7 +109,7 @@
                 myAlert(d.data);
             } else {
                 myAlert('修改成功');
-                $('#courses').html(d);
+                $('#directions').html(d);
             }
         }
         function myAlert(info) {

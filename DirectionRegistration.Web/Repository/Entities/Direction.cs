@@ -12,7 +12,7 @@ namespace DirectionRegistration.Repository.Entities
         public string Title { get; set; }
         public string Description { get; set; }
         [Required]
-        public Teacher Teacher { get; set; }
+        public virtual Teacher Teacher { get; set; }
 
         //public virtual List<Student> FirstStudents { get; set; }
         //public virtual List<Student> SecondStudents { get; set; }

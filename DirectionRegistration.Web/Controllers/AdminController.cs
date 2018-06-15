@@ -10,7 +10,6 @@ using PagedList;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
-using System.Configuration;
 
 namespace DirectionRegistration.Web.Controllers
 {
@@ -225,158 +224,13 @@ namespace DirectionRegistration.Web.Controllers
             var dl = db.ServerConfigurations.FirstOrDefault();
             if (b && dl != null)
             {
-                dl.Deadline = deadlineDt;
+                dl.Deadline = new DateTime(deadlineDt.Year, deadlineDt.Month, deadlineDt.Day, 23, 59, 59);
                 db.SaveChanges();
 
                 return Json(new { code = 0, data = "设置成功" });
             }
             return Json(new { code = 1, data = "设置失败" });
         }
-
-        public ActionResult DirectionManage()
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            return PartialView();
-        }
-
-        public PartialViewResult GetDirections()
-        {
-            return PartialView(bindDirectionViewModel());
-        }
-
-        [HttpPost]
-        public ActionResult DirectionAdd(DirectionViewModel model)
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            Direction d = new Direction
-            {
-                Title = model.Title
-            };
-            this.db.Directions.Add(d);
-            int i = this.db.SaveChanges();
-            if (i > 0)
-            {
-                return PartialView("GetDirections", bindDirectionViewModel());
-            }
-            else
-            {
-                return Json("系统错误");
-            }
-        }
         
-        public ActionResult DirectionDel(int Id)
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            var d = this.db.Directions.SingleOrDefault(dd => dd.Id == Id);
-            if (d != null)
-            {
-                this.db.Directions.Remove(d);
-                int i = this.db.SaveChanges();
-                if (i > 0)
-                {
-                    return PartialView("GetDirections", bindDirectionViewModel());
-                }
-            }
-            return Json("系统错误", JsonRequestBehavior.AllowGet);
-        }
-
-        private List<DirectionViewModel> bindDirectionViewModel()
-        {
-            List<Direction> ds = this.db.Directions.ToList();
-            List<DirectionViewModel> m = new List<DirectionViewModel>();
-            ds.ForEach(dd =>
-            {
-                m.Add(new DirectionViewModel
-                {
-                    Id = dd.Id,
-                    Title = dd.Title
-                });
-            });
-            return m;
-        }
-
-        public ActionResult AdminManage()
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            return PartialView();
-        }
-
-        public PartialViewResult GetAdmins()
-        {
-            return PartialView(bindAdminViewModel());
-        }
-
-        [HttpPost]
-        public ActionResult AdminAdd(Teacher model)
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            Teacher d = new Teacher
-            {
-                LoginName = model.LoginName,
-                Password = "12345678"
-            };
-            this.db.Teachers.Add(d);
-            int i = this.db.SaveChanges();
-            if (i > 0)
-            {
-                return PartialView("GetAdmins", bindAdminViewModel());
-            }
-            else
-            {
-                return Json("系统错误");
-            }
-        }
-
-        public ActionResult AdminDel(int Id)
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            Teacher d = this.db.Teachers.SingleOrDefault(dd => dd.Id == Id);
-            if (d != null)
-            {
-                this.db.Teachers.Remove(d);
-                int i = this.db.SaveChanges();
-                if (i > 0)
-                {
-                    return PartialView("GetAdmins", bindAdminViewModel());
-                }
-            }
-            return Json("系统错误", JsonRequestBehavior.AllowGet);
-        }
-
-        private List<Teacher> bindAdminViewModel()
-        {
-            List<Teacher> ds = this.db.Teachers.ToList();           
-            return ds;
-        }
     }
 }

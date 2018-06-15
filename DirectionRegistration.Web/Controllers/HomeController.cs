@@ -22,6 +22,7 @@ namespace DirectionRegistration.Controllers
             {
                 return RedirectToAction("Login");
             }
+
             Student stu = db.Students.SingleOrDefault(s => s.Number == currentStu);
             IndexViewModel model = new IndexViewModel();
             model.Id = stu.Id;
@@ -30,8 +31,9 @@ namespace DirectionRegistration.Controllers
             model.FirstId = stu.FirstSelection.ToString();
             model.SecondId = stu.SecondSelection.ToString();
             model.ThirdId = stu.ThirdSelection.ToString();
+
             ViewBag.Directions = db.Directions.ToList();
-            ViewBag.IsOverTime = isOverTime();
+            ViewBag.IsOverTime = isTimeOver();
             return View(model);
         }
 
@@ -70,19 +72,22 @@ namespace DirectionRegistration.Controllers
             model.SecondId = stu.SecondSelection.ToString();
             model.ThirdId = stu.ThirdSelection.ToString();
             ViewBag.Directions = db.Directions.ToList();
-            ViewBag.IsOverTime = isOverTime();
+            ViewBag.IsOverTime = isTimeOver();
             return View(model);
         }
 
         //判断选填志愿是否结束。
-        private bool isOverTime()
+        private bool isTimeOver()
         {
             bool b = false;
-            string strDeadline = ConfigurationManager.AppSettings.Get("Deadline");
-            DateTime deadline = DateTime.Parse(strDeadline);
-            if (deadline <= DateTime.Now)
+            var config = db.ServerConfigurations.FirstOrDefault();
+            if (config != null)
             {
-                b = true;
+                DateTime deadline = config.Deadline;
+                if (DateTime.Now >= deadline)
+                {
+                    b = true;
+                }
             }
             return b;
         }
@@ -188,7 +193,7 @@ namespace DirectionRegistration.Controllers
                         stu.Password = model.Password;
                         db.Entry(stu).State = System.Data.EntityState.Modified;
                         db.SaveChanges();
-                        ViewBag.Info = "密码修改成功";
+                        return Json(new { code = 0, data = "密码修改成功，请重新登录。" });
                     }
                 }
                 if (string.IsNullOrEmpty(currentAdmin) == false)
@@ -199,11 +204,11 @@ namespace DirectionRegistration.Controllers
                         admin.Password = model.Password;
                         db.Entry(admin).State = System.Data.EntityState.Modified;
                         db.SaveChanges();
-                        ViewBag.Info = "密码修改成功";
+                        return Json(new { code = 0, data = "密码修改成功，请重新登录。" });
                     }
                 }
             }
-            return View(model);
+            return Json(new { code = 1, data = "密码修改失败" });
         }
 
         public JsonResult ValidateOldPassword(string OldPassword)
@@ -228,7 +233,6 @@ namespace DirectionRegistration.Controllers
                 }
             }
             else
-            //if (string.IsNullOrEmpty(currentAdmin) == false)
             {
                 var admin = db.Teachers.SingleOrDefault(a => a.LoginName == currentAdmin);
                 if (admin == null)

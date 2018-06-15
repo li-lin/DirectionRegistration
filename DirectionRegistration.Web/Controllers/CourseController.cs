@@ -30,13 +30,18 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Add(CourseViewModel course)
         {
-            Course _course = new Course
+            string currentAdmin = Session["admin"] as string;
+            if (string.IsNullOrEmpty(currentAdmin))
             {
-                CourseName = course.CourseName
-            };
+                return RedirectToAction("Login", "Home");
+            }            
 
-            if (isExistedCourse(_course.CourseName))
+            if (!isExistedCourse(course.CourseName))
             {
+                Course _course = new Course
+                {
+                    CourseName = course.CourseName
+                };
                 db.Courses.Add(_course);
                 int i = db.SaveChanges();
                 if (i > 0)
@@ -47,9 +52,33 @@ namespace DirectionRegistration.Web.Controllers
             return Json(new { code = 1, data = "添加失败" });
         }
 
+        public ActionResult Modify(int Id)
+        {
+            string currentAdmin = Session["admin"] as string;
+            if (string.IsNullOrEmpty(currentAdmin))
+            {
+                return RedirectToAction("Login", "Home");
+            }
+
+            Course _course = db.Courses.SingleOrDefault(c => c.Id == Id);
+            CourseViewModel model = new CourseViewModel();
+            if (_course != null)
+            {
+                model.Id = _course.Id;
+                model.CourseName = _course.CourseName;
+            }
+            return PartialView("PartialModifyCourse", model);
+        }
+
         [HttpPost]
         public ActionResult Modify(CourseViewModel course)
         {
+            string currentAdmin = Session["admin"] as string;
+            if (string.IsNullOrEmpty(currentAdmin))
+            {
+                return RedirectToAction("Login", "Home");
+            }
+
             Course _course = db.Courses.SingleOrDefault(c => c.Id == course.Id);
             if (_course != null)
             {
@@ -66,6 +95,12 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Delete(int courseId)
         {
+            string currentAdmin = Session["admin"] as string;
+            if (string.IsNullOrEmpty(currentAdmin))
+            {
+                return RedirectToAction("Login", "Home");
+            }
+
             Course _course = db.Courses.SingleOrDefault(c => c.Id == courseId);
             if (_course != null)
             {
@@ -82,6 +117,12 @@ namespace DirectionRegistration.Web.Controllers
         [HttpGet]
         public ActionResult GetCourses()
         {
+            string currentAdmin = Session["admin"] as string;
+            if (string.IsNullOrEmpty(currentAdmin))
+            {
+                return RedirectToAction("Login", "Home");
+            }
+
             return PartialView("PartialCourseList", getCoursesViewModel());
         }
 

@@ -12,8 +12,6 @@
 <div class="btn-group btn-group-lg" role="group">
     @Html.ActionLink("导入", "UploadData", null, new { id = "btn-import", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
     @Html.ActionLink("导出", "DownloadData", null, new { id="btn-export", @class = "btn btn-success" })
-    @Html.ActionLink("方向", "DirectionManage", null, new { id="btn-direction",@class="btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
-    @Html.ActionLink("管理员", "AdminManage", null, new { id = "btn-admins", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
     @Html.ActionLink("设置", "Setting", null, new { id = "btn-setting", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
 </div>
 <div style="height:10px;clear:both;"></div>
@@ -99,28 +97,16 @@
         $('#btn-import').click(function () {
             whichModal = "import";
         });
-        $('#btn-direction').click(function () {
-            whichModal = "direction";
-        });
         $('#btn-setting').click(function () {
             whichModal = "setting";
-        });
-        $('#btn-admins').click(function () {
-            whichModal = "admins";
         });
         $("#myModal").on("show.bs.modal", function (e) {
             if (whichModal == "import") {
                 $('div.modal').find('.modal-title').text('导入学生数据');
                 $(this).find(".modal-body").empty().load('@Url.Action("UploadData")');
-            } else if (whichModal == "direction") {
-                $('div.modal').find('.modal-title').text('方向管理');
-                $(this).find(".modal-body").empty().load('@Url.Action("DirectionManage")');
             } else if (whichModal == "setting") {
                 $('div.modal').find('.modal-title').text('参数设置');
                 $(this).find(".modal-body").empty().load('@Url.Action("Setting","Admin")');
-            } else if (whichModal == "admins") {
-                $('div.modal').find('.modal-title').text('管理员配置');
-                $(this).find(".modal-body").empty().load('@Url.Action("AdminManage")');
             } else {
                 $(this).modal('close');
             }

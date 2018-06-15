@@ -146,7 +146,10 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\DirectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\StudentController.cs" />
+    <Compile Include="Controllers\TeacherController.cs" />
     <Compile Include="Filters\LoginCheckAttribute.cs" />
     <Compile Include="Helper\DirectionsDropdownListHelper.cs" />
     <Compile Include="Models\ChangePasswordViewModel.cs" />
@@ -154,6 +157,8 @@
     <Compile Include="Models\DirectionViewModel.cs" />
     <Compile Include="Models\RegistrationViewModel.cs" />
     <Compile Include="Models\SettingViewModel.cs" />
+    <Compile Include="Models\TeacherInfoViewModel.cs" />
+    <Compile Include="Models\TeacherViewModel.cs" />
     <Compile Include="Repository\Entities\Course.cs" />
     <Compile Include="Repository\Entities\DirectionCourse.cs" />
     <Compile Include="Repository\Entities\Score.cs" />
@@ -285,6 +290,13 @@
     <Content Include="Views\Admin\GetAdmins.cshtml" />
     <Content Include="Views\Course\Index.cshtml" />
     <Content Include="Views\Course\PartialCourseList.cshtml" />
+    <Content Include="Views\Course\PartialModifyCourse.cshtml" />
+    <Content Include="Views\Direction\Index.cshtml" />
+    <Content Include="Views\Direction\PartialDirectionList.cshtml" />
+    <Content Include="Views\Direction\PartialModifyDirection.cshtml" />
+    <Content Include="Views\Teacher\Index.cshtml" />
+    <Content Include="Views\Teacher\PartialTeacherList.cshtml" />
+    <Content Include="Views\Teacher\PartialModifyTeacher.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

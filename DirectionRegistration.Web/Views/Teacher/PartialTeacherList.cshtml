@@ -1,0 +1,25 @@
+﻿@using DirectionRegistration.Models
+@model IList<TeacherViewModel>
+@foreach (TeacherViewModel d in Model)
+{
+<tr>
+    <td>@d.Name</td>
+    <td>@d.LoginName</td>
+    <td>@d.DirectionName</td>
+    <td>@(d.IsSuper?"是":"否")</td>
+    <td>
+        <button onclick="showModify('@d.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">修改</button>
+        @if (!d.IsSelf)
+        {
+            @Ajax.ActionLink("删除", "Delete", "Teacher",
+                   new { Id = d.Id },
+                   new AjaxOptions() { HttpMethod = "POST", OnSuccess = "onDelSuccess", LoadingElementId = "loading", Confirm = "确定要删除吗？" },
+                   new { @class = "btn btn-warning" })
+         }
+        @Ajax.ActionLink("重置密码", "RePassword", "Teacher",
+                     new { Id = d.Id },
+                     new AjaxOptions() { HttpMethod="POST", OnSuccess= "onRePasswordSuccess", LoadingElementId = "loading", Confirm = "确定要重置密码吗？" },
+                     new { @class = "btn btn-danger" })
+    </td>
+</tr>
+}

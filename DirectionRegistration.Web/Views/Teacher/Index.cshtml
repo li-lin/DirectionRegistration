@@ -1,24 +1,35 @@
-﻿@model DirectionRegistration.Models.CourseViewModel
+﻿@model DirectionRegistration.Models.TeacherViewModel
+
 @{
-    ViewBag.Title = "课程管理";
+    ViewBag.Title = "教师管理";
 }
+
 <div class="alert alert-danger" style="display:none;" id="my-alert">
     <button class="close" type="button">&times;</button>
     <strong></strong>
 </div>
 <div class="page-header">
-    <h3>课程管理</h3>
+    <h3>教师管理</h3>
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">添加课程</h3>
+        <h3 class="panel-title">添加教师</h3>
     </div>
     <div class="panel-body">
         @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAddSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
         {
-            <div class="form-group col-sm-4">
-                <label class="sr-only" for="courseName">课程名</label>
-                @Html.TextBoxFor(model => model.CourseName, new { @class = "form-control", placeholder = "课程名" })
+            <div class="form-group col-sm-3">
+                <label class="sr-only" for="courseName">教师姓名</label>
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "教师姓名" })
+            </div>
+            <div class="form-group col-sm-3">
+                <label class="sr-only" for="courseName">工号</label>
+                @Html.TextBoxFor(model => model.LoginName, new { @class = "form-control", placeholder = "工号" })
+            </div>
+            <div class="form-group col-sm-3">
+                <label>
+                    @Html.CheckBoxFor(model => model.IsSuper)是否为管理员
+                </label>                
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-success">添加</button>
@@ -29,18 +40,21 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">课程列表</h3>
+        <h3 class="panel-title">教师列表</h3>
     </div>
     <div class="panel-body">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>课程名</th>
-                    <th>操作</th>
+                    <th class="col-sm-2">姓名</th>
+                    <th class="col-sm-2">工号</th>
+                    <th class="col-sm-3">负责方向</th>
+                    <th class="col-sm-2">管理员</th>
+                    <th class="col-sm-3">操作</th>
                 </tr>
             </thead>
-            <tbody id="courses">
-                @Html.Action("GetCourses", "Course")
+            <tbody id="teachers">
+                @Html.Action("GetTeachers", "Teacher")
             </tbody>
         </table>
     </div>
@@ -74,8 +88,8 @@
 
         function showModify(id) {
             $("#myModal").on("show.bs.modal", function (e) {
-                $('div.modal').find('.modal-title').text('修改课程名称');
-                $(this).find(".modal-body").empty().load('@Url.Action("Modify","Course")' + '/' + id);
+                $('div.modal').find('.modal-title').text('修改教师');
+                $(this).find(".modal-body").empty().load('@Url.Action("Modify", "Teacher")' + '/' + id);
             });
         }
 
@@ -84,7 +98,7 @@
                 myAlert(d.data);
             } else {
                 myAlert('添加成功');
-                $('#courses').html(d);
+                $('#teachers').html(d);
             }
         }
         function onDelSuccess(d) {
@@ -92,7 +106,7 @@
                 myAlert(d.data);
             } else {
                 myAlert('删除成功');
-                $('#courses').html(d);
+                $('#teachers').html(d);
             }
         }
         function onModifySuccess(d) {
@@ -101,7 +115,15 @@
                 myAlert(d.data);
             } else {
                 myAlert('修改成功');
-                $('#courses').html(d);
+                $('#teachers').html(d);
+            }
+        }
+        function onRePasswordSuccess(d) {
+            $('#myModal').modal('hide')
+            if (d.code == 1) {
+                myAlert(d.data);
+            } else {
+                myAlert(d.data);
             }
         }
         function myAlert(info) {
