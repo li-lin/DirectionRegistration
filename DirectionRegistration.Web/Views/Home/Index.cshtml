@@ -1,114 +1,107 @@
 ﻿@model DirectionRegistration.Models.IndexViewModel
-@using DirectionRegistration.Repository.Entities
+@using DirectionRegistration.Models
 @{
     ViewBag.Title = "Index";
 }
-@{
-    Func<string, List<SelectListItem>> getDirections = (level) =>
-    {
-        var directionListItems = new List<SelectListItem>();
-        directionListItems.Add(
-            new SelectListItem()
-            {
-                Selected = true,
-                Text = level,
-                Value = "0"
-            }
-       );
-        var directions = ViewBag.Directions as List<Direction>;
-        if (directions != null)
-        {
-            directions.ForEach(d =>{
-                directionListItems.Add(new SelectListItem()
-                {
-                    Selected = false,
-                    Text = d.Title,
-                    Value = d.Id.ToString()
-                });
-            });
-        }
-        return directionListItems;
-    };
-}
+
 <div class="alert alert-danger" style="display:none;" id="my-alert">
     <button class="close" type="button">&times;</button>
     <strong></strong>
 </div>
 <div class="page-header">
-    <h2>方向填报 - [@Model.Name : @Model.Number]</h2>
+    <h3>方向填报 - [@Model.Name : @Model.Number]</h3>
 </div>
-<div class="row">
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "col-sm-6 col-sm-offset-3 panel panel-body" }))
-    {
-        @Html.ValidationSummary(true)
-        @Html.HiddenFor(m => m.Id)    
-        <div class="form-group">          
-            <div class="col-sm-12">  
-                @Html.Label("第一志愿")
-            </div>
-            <div class="col-sm-12">                
-                @Html.DropDownListFor(m => m.FirstId,
-                getDirections("请选择"), new { @class = "form-control input-lg" })
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-12">
-                @Html.Label("第二志愿")
-            </div>
-            <div class="col-sm-12">
-                @Html.DropDownListFor(m => m.SecondId,
-          getDirections("请选择"), new { @class = "form-control input-lg" })
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-12">
-                @Html.Label("第三志愿")
-            </div>
-            <div class="col-sm-12">
-                @Html.DropDownListFor(m => m.ThirdId,
-          getDirections("请选择"), new { @class = "form-control input-lg" })
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-12">
-            @{
-                if ((bool)ViewBag.IsOverTime) {
-                    <button type="button" class="btn btn-primary btn-block btn-lg disabled">保存（填报结束）</button> 
-                } else { 
-                    <button type="submit" class="btn btn-primary btn-block btn-lg">保存</button>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">方向列表</h3>
+    </div>
+    <div class="panel-body">
+        <div class="col-sm-6 col-sm-offset-3">
+            <ul id="dlist" style="padding:0px;" class="list-group">
+                @{
+                    foreach (var item in Model.Directions)
+                    {
+                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer"><span class="badge" style="background-color:brown">@item.Order</span>@item.DirectionName</li>
+                    }
                 }
-             }
-            </div>
+            </ul>
+            @{
+                if ((bool)ViewBag.IsOverTime)
+                {
+                    <button type="button" class="btn btn-primary btn-block btn-lg disabled">保存（填报结束）</button>
+                }
+                else
+                {
+                    <button id="btn-save" type="button" class="btn btn-primary btn-block btn-lg">保存</button>
+                }
+            }
         </div>
-        <div class="form-group">
-            <div class="col-sm-12">
-                <p class="text-success text-center">@ViewBag.Info</p>
-            </div>
-        </div>
-    }
+    </div>
 </div>
 
 @section scripts{
+    <script src="~/Scripts/Sortable.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {
-            $(':submit').click(function () {
-                var result = false;
-                var fs = $('select#FirstId').val();
-                var cs = $('select#SecondId').val();
-                var ts = $('select#ThirdId').val();
-                if (fs == 0 || cs==0 || ts==0) {                   
-                    myAlert('请填报完整！');
-                } else if (cs == fs || ts == cs || ts == fs) {
-                    myAlert('请选择三个不同的志愿！');
-                } else {
-                    result = true;
-                }
-                return result;
-            });
+        $(document).ready(function () {            
             $('#my-alert .close').click(function () {
                 $('#my-alert').slideUp();
-            })
+            });
+
+            prepareSortable();
+
+            $('#btn-save').click(function () {
+                var b = confirm('请确认你的方向志愿填报?');
+                if (b) {
+                    var udata = getValues();
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Save")',
+                        data: JSON.stringify(udata),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        success: function (d) {
+                            if (d.code == 0) {
+                                myAlert(d.data);
+                            } else {
+                                myAlert(d.data);
+                            }
+                        }
+                    });
+                }                
+            });
         });
+
+        function prepareSortable() {
+            var list = document.getElementById('dlist');
+            Sortable.create(list, {
+                onEnd: function (evt) {
+                    freshOrders();
+                }
+            });
+        }
+
+        function freshOrders() {
+            var orders = $('#dlist span');            
+            for (var i = 0; i < orders.length; i++) {
+                orders[i].innerHTML = i + 1;
+            }
+        }
+
+        function getValues() {
+            var value = { Sid: '@Model.Id' };
+            var orders = [];
+            var items = $('#dlist li');
+            for (var i = 0; i < items.length; i++) {
+                var item = $(items[i]);
+                orders.push({
+                    Did: item.attr('data-id'),
+                    Order: item.find('span').text()
+                });
+            }
+            value.Orders = orders;
+            return value;
+        }
+
         function myAlert(info) {
             $('#my-alert strong').text(info);
             $('#my-alert').slideDown();

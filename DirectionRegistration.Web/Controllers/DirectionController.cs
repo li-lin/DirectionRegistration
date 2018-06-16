@@ -58,6 +58,7 @@ namespace DirectionRegistration.Web.Controllers
                 Direction d = new Direction
                 {
                     Title = model.Title,
+                    Max = 30,
                     Teacher = teacher
                 };
                 this.db.Directions.Add(d);
@@ -109,6 +110,7 @@ namespace DirectionRegistration.Web.Controllers
                 model.Title = _direction.Title;
                 model.TeacherId = _direction.Teacher.Id;
                 model.TeacherName = _direction.Teacher.Name;
+                model.Max = _direction.Max;
             }
 
             ViewBag.Teachers = getTeacherListItems(model.TeacherId);
@@ -140,6 +142,7 @@ namespace DirectionRegistration.Web.Controllers
                 
                 _direction.Title = direction.Title;
                 _direction.Teacher = teacher;
+                _direction.Max = direction.Max;
                 int i = db.SaveChanges();
                 if (i > 0)
                 {
@@ -159,8 +162,9 @@ namespace DirectionRegistration.Web.Controllers
                 {
                     Id = dd.Id,
                     Title = dd.Title,
-                    TeacherId=dd.Teacher.Id,
-                    TeacherName=dd.Teacher.Name
+                    TeacherId = dd.Teacher.Id,
+                    Max = dd.Max,
+                    TeacherName = dd.Teacher.Name
                 });
             });
             return m;

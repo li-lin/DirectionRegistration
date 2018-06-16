@@ -32,12 +32,12 @@ namespace DirectionRegistration.Web.Controllers
                 reg.Number = s.Number;
                 reg.Name = s.Name;
                 reg.Major = s.Major;
-                string fs = getDirectionName(s.FirstSelection);
-                reg.FirstSelection = fs ?? "未选择";
-                string ss = getDirectionName(s.SecondSelection);
-                reg.SecondSelection = ss ?? "未选择";
-                string ts = getDirectionName(s.ThirdSelection);
-                reg.ThirdSelection = ts ?? "未选择";
+                //string fs = getDirectionName(s.FirstSelection);
+                //reg.FirstSelection = fs ?? "未选择";
+                //string ss = getDirectionName(s.SecondSelection);
+                //reg.SecondSelection = ss ?? "未选择";
+                //string ts = getDirectionName(s.ThirdSelection);
+                //reg.ThirdSelection = ts ?? "未选择";
                 registrations.Add(reg);
             });
             int pageSize = 20;
@@ -174,12 +174,12 @@ namespace DirectionRegistration.Web.Controllers
                    cmdInsert.Parameters.Add(new OleDbParameter("@number", s.Number));
                    cmdInsert.Parameters.Add(new OleDbParameter("@name", s.Name));
                    cmdInsert.Parameters.Add(new OleDbParameter("@major", s.Major));
-                   string fs = getDirectionName(s.FirstSelection);
-                   string ss = getDirectionName(s.SecondSelection);
-                   string ts = getDirectionName(s.ThirdSelection);
-                   cmdInsert.Parameters.Add(new OleDbParameter("@firstSel", (fs ?? "未选择")));
-                   cmdInsert.Parameters.Add(new OleDbParameter("@secondSel", (ss ?? "未选择")));
-                   cmdInsert.Parameters.Add(new OleDbParameter("@thirdSel", (ts ?? "未选择")));
+                   //string fs = getDirectionName(s.FirstSelection);
+                   //string ss = getDirectionName(s.SecondSelection);
+                   //string ts = getDirectionName(s.ThirdSelection);
+                   //cmdInsert.Parameters.Add(new OleDbParameter("@firstSel", (fs ?? "未选择")));
+                   //cmdInsert.Parameters.Add(new OleDbParameter("@secondSel", (ss ?? "未选择")));
+                   //cmdInsert.Parameters.Add(new OleDbParameter("@thirdSel", (ts ?? "未选择")));
                    cmdInsert.ExecuteNonQuery();
                }
                 connection.Close();

@@ -154,6 +154,8 @@
     <Compile Include="Helper\DirectionsDropdownListHelper.cs" />
     <Compile Include="Models\ChangePasswordViewModel.cs" />
     <Compile Include="Models\CourseViewModel.cs" />
+    <Compile Include="Models\DirectionInfoViewModel.cs" />
+    <Compile Include="Models\DirectionSaveViewModel.cs" />
     <Compile Include="Models\DirectionViewModel.cs" />
     <Compile Include="Models\RegistrationViewModel.cs" />
     <Compile Include="Models\SettingViewModel.cs" />
@@ -266,6 +268,7 @@
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\Sortable.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

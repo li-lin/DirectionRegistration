@@ -28,52 +28,96 @@ namespace DirectionRegistration.Controllers
             model.Id = stu.Id;
             model.Name = stu.Name;
             model.Number = stu.Number;
-            model.FirstId = stu.FirstSelection.ToString();
-            model.SecondId = stu.SecondSelection.ToString();
-            model.ThirdId = stu.ThirdSelection.ToString();
 
-            ViewBag.Directions = db.Directions.ToList();
+            if (stu.DirectionStudents.Count == 0)
+            {
+                int order = 0;
+                db.Directions.ToList().ForEach(d =>
+                {
+                    model.Directions.Add(new DirectionInfoViewModel
+                    {
+                        Id = d.Id,
+                        DirectionName = d.Title,
+                        Order = ++order
+                    });
+                });
+            }
+            else
+            {
+                var orderedList = db.DirectionStudents
+                    .Include("Direction")
+                    .Include("Student")
+                    .Where(d => d.Student.Id == stu.Id)
+                    .OrderBy(d => d.Order)
+                    .ToList();
+                foreach(var ds in orderedList)
+                {
+                    model.Directions.Add(new DirectionInfoViewModel
+                    {
+                        Id = ds.Direction.Id,
+                        DirectionName = ds.Direction.Title,
+                        Order = ds.Order
+                    });
+                }
+            }
+                      
             ViewBag.IsOverTime = isTimeOver();
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Index(IndexViewModel model)
+        public ActionResult Save(DirectionSaveViewModel model)
         {
-            var stu = db.Students.SingleOrDefault(s => s.Id == model.Id);
+            if (isTimeOver()) return Json(new { code = 1, data = "填报已截止" });
+
+            Student stu = db.Students.SingleOrDefault(s => s.Id == model.Sid);
             if (stu != null)
             {
-                stu.FirstSelection = int.Parse(model.FirstId);
-                stu.SecondSelection = int.Parse(model.SecondId);
-                stu.ThirdSelection = int.Parse(model.ThirdId);
-                db.Entry(stu).State = System.Data.EntityState.Modified;
-                db.SaveChanges();
-                //StringBuilder sb = new StringBuilder("你的选择是：<br/><ol>");
-                //if (stu.FirstSelection != null)
-                //{
-                //    sb.AppendFormat("<li>第一志愿:{0}<li>", stu.FirstSelection.Title);
-                //}
-                //if (stu.SecondSelection != null)
-                //{
-                //    sb.AppendFormat("<li>第二志愿:{0}<li>", stu.SecondSelection.Title);
-                //}
-                //if (stu.ThirdSelection != null)
-                //{
-                //    sb.AppendFormat("<li>第三志愿:{0}<li>", stu.ThirdSelection.Title);
-                //}
-                //sb.Append("</ol>");
-                //ViewBag.Info = sb.ToString();
-                ViewBag.Info = "保存成功";
+                int tag = 0;
+                if (stu.DirectionStudents.Count == 0)
+                {                    
+                    foreach(var item in model.Orders)
+                    {
+                        var direction = db.Directions.SingleOrDefault(d => d.Id == item.Did);
+                        if (direction != null)
+                        {
+                            var dd = new DirectionStudent();
+                            dd.Order = item.Order;
+                            dd.Direction = direction;
+
+                            stu.DirectionStudents.Add(dd);
+                            tag++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    //修改填报信息                    
+                    foreach (var item in model.Orders)
+                    {
+                        var selectedDirection = db.DirectionStudents.Include("Direction").Include("Student").SingleOrDefault(d => d.Student.Id == stu.Id && d.Direction.Id == item.Did);
+                        if (selectedDirection != null)
+                        {
+                            selectedDirection.Order = item.Order;
+                            tag++;
+                        }
+                    }
+                }
+
+                if (tag == model.Orders.Count)
+                {
+                    int i = db.SaveChanges();
+                    if (i > 0)
+                    {
+                        return Json(new { code = 0, data = "填报成功" });
+                    }
+                }
             }
-            model.Id = stu.Id;
-            model.Name = stu.Name;
-            model.Number = stu.Number;
-            model.FirstId = stu.FirstSelection.ToString();
-            model.SecondId = stu.SecondSelection.ToString();
-            model.ThirdId = stu.ThirdSelection.ToString();
-            ViewBag.Directions = db.Directions.ToList();
-            ViewBag.IsOverTime = isTimeOver();
-            return View(model);
+            return Json(new { code = 1, data = "保存失败" });
         }
 
         //判断选填志愿是否结束。

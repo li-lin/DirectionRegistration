@@ -8,11 +8,13 @@ namespace DirectionRegistration.Models
 {
     public class IndexViewModel
     {
+        public IndexViewModel()
+        {
+            Directions = new List<DirectionInfoViewModel>();
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Number { get; set; }
-        public string FirstId { get; set; }
-        public string SecondId { get; set; }
-        public string ThirdId { get; set; }
+        public List<DirectionInfoViewModel> Directions { get; set; }
     }
 }

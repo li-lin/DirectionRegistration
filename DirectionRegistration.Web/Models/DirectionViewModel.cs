@@ -15,5 +15,6 @@ namespace DirectionRegistration.Models
         public int TeacherId { get; set; }
         [Required(ErrorMessage ="必填")]
         public string TeacherName { get; set; }
+        public int Max { get; set; }
     }
 }

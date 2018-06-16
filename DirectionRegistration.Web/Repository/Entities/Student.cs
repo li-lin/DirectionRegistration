@@ -11,6 +11,7 @@ namespace DirectionRegistration.Repository.Entities
         public Student()
         {
             Scores = new List<Score>();
+            DirectionStudents = new List<DirectionStudent>();
         }
         public int Id { get; set; }
         public string Number { get; set; }
@@ -20,10 +21,11 @@ namespace DirectionRegistration.Repository.Entities
         public string Major { get; set; }
 
         public virtual List<Score> Scores { get; set; }
+        public virtual List<DirectionStudent> DirectionStudents { get; set; }
 
-        public int FirstSelection { get; set; }
-        public int SecondSelection { get; set; }
-        public int ThirdSelection { get; set; }
+        //public int FirstSelection { get; set; }
+        //public int SecondSelection { get; set; }
+        //public int ThirdSelection { get; set; }
 
         //[InverseProperty("FirstStudents")]
         //public virtual Direction FirstSelection { get; set; }
