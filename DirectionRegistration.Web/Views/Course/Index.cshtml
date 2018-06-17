@@ -73,9 +73,10 @@
         });
 
         function showModify(id) {
-            $("#myModal").on("show.bs.modal", function (e) {
-                $('div.modal').find('.modal-title').text('修改课程名称');
-                $(this).find(".modal-body").empty().load('@Url.Action("Modify","Course")' + '/' + id);
+            var url = '@Url.Action("Modify","Course")' + '/' + id;
+            handleModal({
+                title: '修改课程信息',
+                url: url
             });
         }
 

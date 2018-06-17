@@ -12,7 +12,7 @@ namespace DirectionRegistration.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage="请输入原密码")]
-        [Remote("ValidateOldPassword","Home")]
+        //[Remote("ValidateOldPassword","Home")]
         public string OldPassword { get; set; }
 
         [Required(ErrorMessage="请输入密码")]

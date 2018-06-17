@@ -87,9 +87,10 @@
         });
 
         function showModify(id) {
-            $("#myModal").on("show.bs.modal", function (e) {
-                $('div.modal').find('.modal-title').text('修改教师');
-                $(this).find(".modal-body").empty().load('@Url.Action("Modify", "Teacher")' + '/' + id);
+            var url = '@Url.Action("Modify", "Teacher")' + '/' + id;
+            handleModal({
+                title: '修改教师信息',
+                url: url
             });
         }
 
@@ -110,7 +111,7 @@
             }
         }
         function onModifySuccess(d) {
-            $('#myModal').modal('hide')
+            $('#myModal').modal('hide');
             if (d.code == 1) {
                 myAlert(d.data);
             } else {
@@ -119,7 +120,7 @@
             }
         }
         function onRePasswordSuccess(d) {
-            $('#myModal').modal('hide')
+            $('#myModal').modal('hide');
             if (d.code == 1) {
                 myAlert(d.data);
             } else {

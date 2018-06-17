@@ -82,12 +82,13 @@
         });
 
         function showModify(id) {
-            $("#myModal").on("show.bs.modal", function (e) {
-                $('div.modal').find('.modal-title').text('修改方向');
-                $(this).find(".modal-body").empty().load('@Url.Action("Modify","Direction")' + '/' + id);
+            var url = '@Url.Action("Modify","Direction")' + '/' + id;
+            handleModal({
+                title: '修改方向信息',
+                url: url
             });
         }
-
+        
         function onAddSuccess(d) {
             if (d.code == 1) {
                 myAlert(d.data);

@@ -232,8 +232,14 @@ namespace DirectionRegistration.Controllers
                 if (string.IsNullOrEmpty(currentStu) == false)
                 {
                     var stu = db.Students.SingleOrDefault(s => s.Id == model.Id);
+                    
                     if (stu != null)
                     {
+                        if (stu.Password != model.OldPassword)
+                        {
+                            return Json(new { code = 1, data = "原密码不正确" });
+                        }
+
                         stu.Password = model.Password;
                         db.Entry(stu).State = System.Data.EntityState.Modified;
                         db.SaveChanges();
@@ -245,6 +251,11 @@ namespace DirectionRegistration.Controllers
                     var admin = db.Teachers.SingleOrDefault(a => a.Id == model.Id);
                     if (admin != null)
                     {
+                        if (admin.Password != model.OldPassword)
+                        {
+                            return Json(new { code = 1, data = "原密码不正确" });
+                        }
+
                         admin.Password = model.Password;
                         db.Entry(admin).State = System.Data.EntityState.Modified;
                         db.SaveChanges();
@@ -253,46 +264,6 @@ namespace DirectionRegistration.Controllers
                 }
             }
             return Json(new { code = 1, data = "密码修改失败" });
-        }
-
-        public JsonResult ValidateOldPassword(string OldPassword)
-        {
-            string currentStu = Session["currStu"] as string;
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentStu) == false)
-            {
-                var stu = db.Students.SingleOrDefault(s => s.Number == currentStu);
-                if (stu == null)
-                {
-                    return Json("密码修改：系统错误，请联系管理员。", JsonRequestBehavior.AllowGet);
-                }
-
-                if (stu.Password != OldPassword)
-                {
-                    return Json("原密码不正确", JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    return Json(true, JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
-            {
-                var admin = db.Teachers.SingleOrDefault(a => a.LoginName == currentAdmin);
-                if (admin == null)
-                {
-                    return Json("密码修改：系统错误，请联系管理员。", JsonRequestBehavior.AllowGet);
-                }
-
-                if (admin.Password != OldPassword)
-                {
-                    return Json("原密码不正确", JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    return Json(true, JsonRequestBehavior.AllowGet);
-                }
-            }
-        }
+        }        
     }
 }
