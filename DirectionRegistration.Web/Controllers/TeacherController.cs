@@ -128,10 +128,7 @@ namespace DirectionRegistration.Web.Controllers
                 _teacher.LoginName = teacher.LoginName;
                 _teacher.IsSuper = teacher.IsSuper;
                 int i = db.SaveChanges();
-                if (i > 0)
-                {
-                    return PartialView("PartialTeacherList", bindTeacherViewModel());
-                }
+                return PartialView("PartialTeacherList", bindTeacherViewModel());
             }
             return Json(new { code = 1, data = "修改失败" });
         }

@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Data;
 using System.Data.OleDb;
 using System.IO;
+using System.Text;
 using PagedList;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
@@ -16,131 +17,96 @@ namespace DirectionRegistration.Web.Controllers
     public class AdminController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
+
         public ActionResult Index(int? page)
         {
             string currentAdmin = Session["admin"] as string;
             if (string.IsNullOrEmpty(currentAdmin))
             {
-                return RedirectToAction("Login", "Home");
+                return RedirectToAction("Quit", "Home");
             }
 
+            Teacher teacher = db.Teachers.SingleOrDefault(t => t.LoginName == currentAdmin);
+            if (teacher == null)
+            {
+                return RedirectToAction("Quit", "Home");
+            }
+            
             List<RegistrationViewModel> registrations = new List<RegistrationViewModel>();
-            db.Students.ToList().ForEach(s =>
+            var directionsByStudent = db.DirectionStudents.GroupBy(ds => ds.Student).ToList();
+
+            foreach (var group in directionsByStudent)
             {
                 var reg = new RegistrationViewModel();
-                reg.Id = s.Id;
-                reg.Number = s.Number;
-                reg.Name = s.Name;
-                reg.Major = s.Major;
-                //string fs = getDirectionName(s.FirstSelection);
-                //reg.FirstSelection = fs ?? "未选择";
-                //string ss = getDirectionName(s.SecondSelection);
-                //reg.SecondSelection = ss ?? "未选择";
-                //string ts = getDirectionName(s.ThirdSelection);
-                //reg.ThirdSelection = ts ?? "未选择";
-                registrations.Add(reg);
-            });
+                reg.Id = group.Key.Id;
+                reg.Number = group.Key.Number;
+                reg.Name = group.Key.Name;
+                reg.Gender = group.Key.Gender;
+                reg.Major = group.Key.Major;
+
+                reg.Selections = group.OrderBy(g => g.Order).Select(ds => new DirectionInfoViewModel
+                {
+                    Id = ds.Direction.Id,
+                    DirectionName = ds.Direction.Title,
+                    Order = ds.Order
+                }).Take(5).ToList();
+
+                if (!teacher.IsSuper)
+                {
+                    int dirId = teacher.Direction.Id;
+                    if (reg.Selections[0].Id == dirId || reg.Selections[1].Id == dirId)
+                        registrations.Add(reg);
+                }
+                else
+                {
+                    registrations.Add(reg);
+                }
+            }
+
+            ViewBag.All = db.Students.Count();
+            ViewBag.Now = registrations.Count;
+            if (!teacher.IsSuper)
+            {
+                ViewBag.DirName = teacher.Direction.Title;
+            }
+            else
+            {
+                ViewBag.DirName = "全部";
+            }
+            ViewBag.TeacherInfo = teacher.LoginName + " | " + teacher.Name;
             int pageSize = 20;
             int pageNumber = (page ?? 1);
             return View(registrations.ToPagedList(pageNumber, pageSize));
         }
 
-        private string getDirectionName(int id)
+        public ActionResult Details(int id)
         {
-            string dName = null;
-            var dir = db.Directions.SingleOrDefault(d => d.Id == id);
-            if (dir != null)
+            RegistrationViewModel selection = new RegistrationViewModel();
+            var student = db.Students.SingleOrDefault(s => s.Id == id);
+            if (student != null)
             {
-                dName = dir.Title;
-            }
-            return dName;
-        }
-
-        public ActionResult UploadData()
-        {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            return PartialView();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult UploadData(IEnumerable<HttpPostedFileBase> files)
-        {
-            if (files != null)
-            {
-                foreach (var file in files)
+                var directionsByStudent = db.DirectionStudents.Where(ds => ds.Student.Id == id).OrderBy(ds => ds.Order).ToList();
+                selection.Id = student.Id;
+                selection.Number = student.Number;
+                selection.Name = student.Name;
+                selection.Gender = student.Gender;
+                selection.Major = student.Major;
+                foreach(var dir in directionsByStudent)
                 {
-                    string fileExtentian = file.FileName.Substring(file.FileName.LastIndexOf(".")).ToLower();
-                    if (fileExtentian == ".xls" || fileExtentian == ".xlsx")
+                    selection.Selections.Add(new DirectionInfoViewModel
                     {
-                        string newFileName = DateTime.Now.ToString("yyyyMMddhhmmss") + fileExtentian;
-                        string path = Server.MapPath("~/Content/UploadFiles/" + newFileName);
-                        file.SaveAs(path);
-
-                        int b = importStudentsFromExcel(path);
-                        if (b == 1)
-                        {
-                            return Json(new { code = "101", msg = "学生数据导入成功。" });
-                        }
-                        else if (b == 2)
-                        {
-                            return Json(new { code = "102", msg = "学生数据重复，请确认后再导入。" });
-                        }
-                    }
+                        Id = dir.Direction.Id,
+                        DirectionName = dir.Direction.Title,
+                        Order = dir.Order
+                    });
                 }
+
+                return PartialView("PartialSelectionDetails", selection);
             }
-            return Json(new { code = "100", msg = "学生数据上传或导入失败。" });
+            //return Json(new { code = 1, data = "系统错误" });     
+            return Content("系统错误");
         }
 
-        private int importStudentsFromExcel(string path)
-        {
-            int result = 0;//0：失败
-            string connectionString = "Provider=Microsoft.Jet.OleDb.4.0; Data Source=" + path + "; Extended Properties=Excel 8.0;";
-            using (OleDbConnection Connection = new OleDbConnection(connectionString))
-            {
-                DataTable dt = new DataTable();
-                Connection.Open();
-                using (OleDbCommand command = new OleDbCommand())
-                {
-                    command.Connection = Connection;
-                    command.CommandText = "SELECT * FROM [学生名单$]";
-                    OleDbDataAdapter adapter = new OleDbDataAdapter(command);
-                    adapter.Fill(dt);
-                    foreach (DataRow dr in dt.Rows)
-                    {
-                        Student s = new Student();
-                        s.Number = dr["学号"].ToString();
-                        s.Name = dr["姓名"].ToString();
-                        s.Gender = dr["性别"].ToString();
-                        s.Major = dr["专业名称"].ToString();
-                        s.Password = "123456";
-                        //判断导入学生信息是否与数据库中重复。
-                        if (checkStudentExist(s))
-                        {
-                            return 2;//2：数据重复
-                        }
-                        this.db.Students.Add(s);
-                    }
-                    int i = this.db.SaveChanges();
-                    if (i > 0) result = 1; //1：成功
-                }
-            }
-            return result;
-        }
-
-        private bool checkStudentExist(Student student)
-        {
-            bool r = false;
-            int ss = this.db.Students.Count(s=>s.Number == student.Number);
-            if (ss != 0) r = true;
-            return r;
-        }
-         
         //下载学生志愿填报情况（Excel）
         public ActionResult DownloadData()
         {
@@ -153,35 +119,70 @@ namespace DirectionRegistration.Web.Controllers
             string tempPath = Server.MapPath("~/Content/DownloadFiles/temp.xls");
             string path = Server.MapPath("~/Content/DownloadFiles/方向志愿-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".xls");
             System.IO.File.Copy(tempPath, path);
-         
+
             string connectionString = "Provider=Microsoft.Jet.OleDb.4.0; Data Source=" + path + "; Extended Properties=Excel 8.0;";
+            StringBuilder stringBuilder1 = new StringBuilder("CREATE TABLE [学生名单$](学号 Char(100), 姓名 char(100),性别 char(20), 专业 char(160)");
+            StringBuilder stringBuilder2 = new StringBuilder("INSERT INTO[学生名单$](学号, 姓名, 性别, 专业");
+            StringBuilder stringBuilder3 = new StringBuilder(" VALUES(@number,@name,@gender,@major");
+            int directionCount = db.Directions.Count();
+            for (int i = 0; i < directionCount; i++)
+            {
+                stringBuilder1.Append($", 志愿{i + 1} char(160)");
+                stringBuilder2.Append($", 志愿{i + 1}");
+                stringBuilder3.Append($", @want{i + 1}");
+            }
+            stringBuilder1.Append(")");
+            stringBuilder2.Append(")");
+            stringBuilder3.Append(")");
+
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
                 connection.Open();
                 using (OleDbCommand command = new OleDbCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = "CREATE TABLE [学生名单$](学号 Char(100), 姓名 char(100), 专业 char(250), 第一志愿 char(200), 第二志愿 char(200), 第三志愿 char(200))";
+                    command.CommandText = stringBuilder1.ToString();
                     command.ExecuteNonQuery();
                 }
 
-               List<Student> students = this.db.Students.ToList();
-               foreach (Student s in students)
-               {
-                   OleDbCommand cmdInsert = new OleDbCommand();
-                   cmdInsert.Connection = connection;
-                   cmdInsert.CommandText = "INSERT INTO [学生名单$](学号,姓名,专业,第一志愿,第二志愿,第三志愿) VALUES(@number,@name,@major,@firstSel,@secondSel,@thirdSel)";
-                   cmdInsert.Parameters.Add(new OleDbParameter("@number", s.Number));
-                   cmdInsert.Parameters.Add(new OleDbParameter("@name", s.Name));
-                   cmdInsert.Parameters.Add(new OleDbParameter("@major", s.Major));
-                   //string fs = getDirectionName(s.FirstSelection);
-                   //string ss = getDirectionName(s.SecondSelection);
-                   //string ts = getDirectionName(s.ThirdSelection);
-                   //cmdInsert.Parameters.Add(new OleDbParameter("@firstSel", (fs ?? "未选择")));
-                   //cmdInsert.Parameters.Add(new OleDbParameter("@secondSel", (ss ?? "未选择")));
-                   //cmdInsert.Parameters.Add(new OleDbParameter("@thirdSel", (ts ?? "未选择")));
-                   cmdInsert.ExecuteNonQuery();
-               }
+                List<RegistrationViewModel> registrations = new List<RegistrationViewModel>();
+                var directionsByStudent = db.DirectionStudents.GroupBy(ds => ds.Student).ToList();
+
+                foreach (var group in directionsByStudent)
+                {
+                    var reg = new RegistrationViewModel();
+                    reg.Id = group.Key.Id;
+                    reg.Number = group.Key.Number;
+                    reg.Name = group.Key.Name;
+                    reg.Gender = group.Key.Gender;
+                    reg.Major = group.Key.Major;
+
+                    reg.Selections = group.OrderBy(g => g.Order).Select(ds => new DirectionInfoViewModel
+                    {
+                        Id = ds.Direction.Id,
+                        DirectionName = ds.Direction.Title,
+                        Order = ds.Order
+                    }).ToList();
+
+                    registrations.Add(reg);
+                }
+
+                string commandText = stringBuilder2.ToString() + stringBuilder3.ToString();
+                foreach (var s in registrations)
+                {
+                    OleDbCommand cmdInsert = new OleDbCommand();
+                    cmdInsert.Connection = connection;
+                    cmdInsert.CommandText = commandText;
+                    cmdInsert.Parameters.Add(new OleDbParameter("@number", s.Number));
+                    cmdInsert.Parameters.Add(new OleDbParameter("@name", s.Name));
+                    cmdInsert.Parameters.Add(new OleDbParameter("@gender", s.Gender));
+                    cmdInsert.Parameters.Add(new OleDbParameter("@major", s.Major));
+                    foreach (var d in s.Selections)
+                    {
+                        cmdInsert.Parameters.Add(new OleDbParameter("@want" + d.Order.ToString(), d.DirectionName));
+                    }
+                    cmdInsert.ExecuteNonQuery();
+                }
                 connection.Close();
             }
             return File(path, "application/vnd.ms-excel", path.Substring(path.LastIndexOf("\\")));
@@ -213,12 +214,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Setting(string deadline)
         {
-            //string currentAdmin = Session["admin"] as string;
-            //if (string.IsNullOrEmpty(currentAdmin))
-            //{
-            //    return RedirectToAction("Login", "Home");
-            //}
-
             DateTime deadlineDt = DateTime.Now;
             bool b = DateTime.TryParse(deadline, out deadlineDt);
             var dl = db.ServerConfigurations.FirstOrDefault();

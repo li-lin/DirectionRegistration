@@ -55,68 +55,41 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel"></h4>
-            </div>
-            <div class="modal-body">
-                <!--modal body-->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section scripts{
     <script>
-        $(document).ready(function () {
-            $('#my-alert .close').click(function () {
-                $('#my-alert').slideUp();
-            });
-        });
-
         function showModify(id) {
             var url = '@Url.Action("Modify","Direction")' + '/' + id;
             handleModal({
                 title: '修改方向信息',
-                url: url
+                url: url,
+                submit: '保存'
             });
         }
         
         function onAddSuccess(d) {
             if (d.code == 1) {
-                myAlert(d.data);
+                toastr.warning(d.data);
             } else {
-                myAlert('添加成功');
+                toastr.success('添加成功');
                 $('#directions').html(d);
             }
         }
         function onDelSuccess(d) {
             if (d.code == 1) {
-                myAlert(d.data);
+                toastr.warning(d.data);
             } else {
-                myAlert('删除成功');
+                toastr.success('删除成功');
                 $('#directions').html(d);
             }
         }
         function onModifySuccess(d) {
             $('#myModal').modal('hide')
             if (d.code == 1) {
-                myAlert(d.data);
+                toastr.warning(d.data);
             } else {
-                myAlert('修改成功');
+                toastr.success('修改成功');
                 $('#directions').html(d);
             }
-        }
-        function myAlert(info) {
-            $('#my-alert strong').text(info);
-            $('#my-alert').slideDown();
         }
     </script>
 }

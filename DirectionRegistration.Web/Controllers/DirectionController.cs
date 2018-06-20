@@ -58,7 +58,7 @@ namespace DirectionRegistration.Web.Controllers
                 Direction d = new Direction
                 {
                     Title = model.Title,
-                    Max = 30,
+                    Max = 35,
                     Teacher = teacher
                 };
                 this.db.Directions.Add(d);
@@ -139,15 +139,12 @@ namespace DirectionRegistration.Web.Controllers
                 {
                     return Json(new { code = 1, data = "该负责人已指定负责方向" });
                 }
-                
+
                 _direction.Title = direction.Title;
                 _direction.Teacher = teacher;
                 _direction.Max = direction.Max;
                 int i = db.SaveChanges();
-                if (i > 0)
-                {
-                    return PartialView("PartialDirectionList", bindDirectionViewModel());
-                }
+                return PartialView("PartialDirectionList", bindDirectionViewModel());
             }
             return Json(new { code = 1, data = "修改失败" });
         }

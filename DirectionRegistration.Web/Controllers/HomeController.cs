@@ -45,8 +45,6 @@ namespace DirectionRegistration.Controllers
             else
             {
                 var orderedList = db.DirectionStudents
-                    .Include("Direction")
-                    .Include("Student")
                     .Where(d => d.Student.Id == stu.Id)
                     .OrderBy(d => d.Order)
                     .ToList();
@@ -99,7 +97,7 @@ namespace DirectionRegistration.Controllers
                     //修改填报信息                    
                     foreach (var item in model.Orders)
                     {
-                        var selectedDirection = db.DirectionStudents.Include("Direction").Include("Student").SingleOrDefault(d => d.Student.Id == stu.Id && d.Direction.Id == item.Did);
+                        var selectedDirection = db.DirectionStudents.SingleOrDefault(d => d.Student.Id == stu.Id && d.Direction.Id == item.Did);
                         if (selectedDirection != null)
                         {
                             selectedDirection.Order = item.Order;

@@ -84,10 +84,7 @@ namespace DirectionRegistration.Web.Controllers
             {
                 _course.CourseName = course.CourseName;
                 int i = db.SaveChanges();
-                if (i > 0)
-                {
-                    return PartialView("PartialCourseList", getCoursesViewModel());
-                }
+                return PartialView("PartialCourseList", getCoursesViewModel());
             }
             return Json(new { code = 1, data = "修改失败" });
         }

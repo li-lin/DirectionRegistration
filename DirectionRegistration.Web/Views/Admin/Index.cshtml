@@ -6,65 +6,50 @@
 }
 
 <div class="page-header">
-    <h3>管理面板 - [@Session["admin"].ToString()]</h3>
+    <h3>管理面板 - [@ViewBag.TeacherInfo]<span class="label label-primary pull-right">已填报[<span style="color:brown">@ViewBag.DirName</span>]方向 @ViewBag.Now 人，共 @ViewBag.All 人</span></h3>
 </div>
 
-<div class="btn-group btn-group-lg" role="group">
-    @Html.ActionLink("导入", "UploadData", null, new { id = "btn-import", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
-    @Html.ActionLink("导出", "DownloadData", null, new { id="btn-export", @class = "btn btn-success" })
-    @Html.ActionLink("设置", "Setting", null, new { id = "btn-setting", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
-</div>
-<div style="height:10px;clear:both;"></div>
 <table class="table table-striped">
     <thead>
         <tr>
             <th>学号</th>
             <th>姓名</th>
+            <th>性别</th>
             <th>专业</th>
-            <th>第一志愿</th>
-            <th>第二志愿</th>
-            <th>第三志愿</th>
-            <th>第四志愿</th>
-            <th>第五志愿</th>
+            <th>第1志愿</th>
+            <th>第2志愿</th>
+            <th>第3志愿</th>
+            <th>第4志愿</th>
+            <th>第5志愿</th>
             <th>操作</th>
         </tr>
     </thead>
     <tbody id="tableBody">
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Number)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Major)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstSelection)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SecondSelection)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ThirdSelection)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SecondSelection)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ThirdSelection)
-            </td>
-            <td>
-                <div class="btn-toolbar" role="toolbar">
-                    <div class="btn-group btn-group-sm" role="group">
-                        @Html.ActionLink("详情", "Detail", new { id = item.Id }, new { @class = "btn btn-default" })
-                    </div>
-                </div>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @item.Number
+                </td>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Gender
+                </td>
+                <td>
+                    @item.Major
+                </td>
+                @foreach (var dir in item.Selections)
+                {
+                    <td>
+                        @dir.DirectionName
+                    </td>
+                }
+                <td>
+                    <button onclick="showDetail('@item.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">详情</button>
+                </td>
+            </tr>
         }
     </tbody>
 </table>
@@ -80,22 +65,13 @@
 
 
 @section scripts{
-<script src="~/Scripts/jquery.form.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#btn-import').click(function () {
+    <script>
+        function showDetail(id) {
             handleModal({
-                title: '导入学生数据',
-                url: '@Url.Action("UploadData")'
+                title: '填报详情',
+                url: '@Url.Action("Details","Admin")' + '/' + id
             });
-        });
-        $('#btn-setting').click(function () {
-            handleModal({
-                title: '参数设置',
-                url: '@Url.Action("Setting","Admin")'
-            });
-        });
+        }
 
-    });
-</script>
+    </script>
 }

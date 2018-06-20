@@ -1,15 +1,11 @@
 ﻿@model DirectionRegistration.Models.CourseViewModel
 
-@using (Ajax.BeginForm("Modify", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onModifySuccess",LoadingElementId="loading" }, new { @class = "form-inline" }))
+@using (Ajax.BeginForm("Modify", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onModifySuccess",LoadingElementId="loading" }, new { @class = "form" }))
 {
-    <div class="form-group col-sm-6">
+    <div class="form-group">
         <label class="sr-only" for="courseName">课程名</label>
         @Html.HiddenFor(model => model.Id)
         @Html.TextBoxFor(model => model.CourseName, new { @class = "form-control", placeholder = "课程名" })
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-success">保存</button>
-        <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
     </div>
 }
 

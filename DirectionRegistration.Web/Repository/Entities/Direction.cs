@@ -21,9 +21,5 @@ namespace DirectionRegistration.Repository.Entities
         public virtual Teacher Teacher { get; set; }
         public virtual List<DirectionStudent> DirectionStudents { get; set; }
         public virtual List<DirectionCourse> DirectionCourses { get; set; }
-
-        //public virtual List<Student> FirstStudents { get; set; }
-        //public virtual List<Student> SecondStudents { get; set; }
-        //public virtual List<Student> ThirdStudents { get; set; }
     }
 }

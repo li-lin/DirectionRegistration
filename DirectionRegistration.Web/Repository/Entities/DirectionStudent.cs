@@ -8,8 +8,8 @@ namespace DirectionRegistration.Repository.Entities
     public class DirectionStudent
     {
         public int Id { get; set; }
-        public Student Student { get; set; }
-        public Direction Direction { get; set; }
+        public virtual Student Student { get; set; }
+        public virtual Direction Direction { get; set; }
         public int Order { get; set; }
     }
 }

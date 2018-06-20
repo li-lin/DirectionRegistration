@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.ComponentModel.DataAnnotations;
 
 namespace DirectionRegistration.Models
 {
-    public class RegistrationViewModel
+    public class StudentInfoViewModel
     {
-        public RegistrationViewModel()
-        {
-            Selections = new List<DirectionInfoViewModel>();
-        }
         public int Id { get; set; }
+        [Required(ErrorMessage ="必填")]
         public string Number { get; set; }
-        public string Gender { get; set; }
+        [Required(ErrorMessage = "必填")]
         public string Name { get; set; }
+        public string Gender { get; set; }
         public string Major { get; set; }
-        public List<DirectionInfoViewModel> Selections { get; set; }
     }
 }
