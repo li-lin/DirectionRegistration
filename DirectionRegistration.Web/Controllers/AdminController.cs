@@ -11,6 +11,7 @@ using PagedList;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
@@ -18,13 +19,10 @@ namespace DirectionRegistration.Web.Controllers
     {
         private RegistrationDbContext db = new RegistrationDbContext();
 
+        [LoginCheck]
         public ActionResult Index(int? page)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Quit", "Home");
-            }
+            string currentAdmin = Session["admin"] as string;           
 
             Teacher teacher = db.Teachers.SingleOrDefault(t => t.LoginName == currentAdmin);
             if (teacher == null)
@@ -79,6 +77,7 @@ namespace DirectionRegistration.Web.Controllers
             return View(registrations.ToPagedList(pageNumber, pageSize));
         }
 
+        [LoginCheck]
         public ActionResult Details(int id)
         {
             RegistrationViewModel selection = new RegistrationViewModel();
@@ -108,6 +107,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
         //下载学生志愿填报情况（Excel）
+        [AdminCheck]
         public ActionResult DownloadData()
         {
             string currentAdmin = Session["admin"] as string;
@@ -189,6 +189,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
         //设置截止日期
+        [AdminCheck]
         public ActionResult Setting()
         {
             string currentAdmin = Session["admin"] as string;
@@ -212,6 +213,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
         [HttpPost]
+        [AdminCheck]
         public ActionResult Setting(string deadline)
         {
             DateTime deadlineDt = DateTime.Now;

@@ -8,9 +8,11 @@ using System.Data.OleDb;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
+    [AdminCheck]
     public class StudentController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
@@ -19,13 +21,6 @@ namespace DirectionRegistration.Web.Controllers
 
         public ActionResult Index()
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-
             StudentInfoViewModel model = new StudentInfoViewModel();
             List<SelectListItem> majorList = new List<SelectListItem>();
             foreach(string s in getMajors())
@@ -97,12 +92,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Delete(int Id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Student d = db.Students.SingleOrDefault(dd => dd.Id == Id);
             if (d != null)
             {
@@ -119,12 +108,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpGet]
         public ActionResult Modify(int Id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Student _student = db.Students.SingleOrDefault(d => d.Id == Id);
             StudentInfoViewModel model = new StudentInfoViewModel();
             if (_student != null)
@@ -153,12 +136,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Modify(StudentInfoViewModel student)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Student _student = db.Students.SingleOrDefault(d => d.Id == student.Id);
             if (_student != null)
             {
@@ -175,12 +152,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult RePassword(int id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Student _student = db.Students.SingleOrDefault(d => d.Id == id);
             if (_student != null)
             {
@@ -193,12 +164,6 @@ namespace DirectionRegistration.Web.Controllers
 
         public ActionResult UploadData()
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             return PartialView("UploadData");
         }
 

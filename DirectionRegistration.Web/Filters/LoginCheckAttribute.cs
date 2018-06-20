@@ -6,15 +6,17 @@ using System.Web.Mvc;
 
 namespace DirectionRegistration.Web.Filters
 {
-    public class LoginCheckAttribute : AuthorizeAttribute
+    public class LoginCheckAttribute : ActionFilterAttribute
     {
-        public override void OnAuthorization(AuthorizationContext filterContext)
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             string currentStu = filterContext.HttpContext.Session["currStu"] as string;
             string currentAdmin = filterContext.HttpContext.Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentStu)||string.IsNullOrEmpty(currentAdmin))
+            if (string.IsNullOrEmpty(currentStu) && string.IsNullOrEmpty(currentAdmin))
             {
-                filterContext.HttpContext.Response.Redirect("~/Home/Login", true);
+                HttpContext.Current.Response.Write("<script>window.location.href='/Home/Login'</script>");
+                HttpContext.Current.Response.End();
+                return;
             }
         }
     }

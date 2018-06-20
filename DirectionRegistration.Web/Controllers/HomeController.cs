@@ -8,6 +8,7 @@ using System.Configuration;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Controllers
 {
@@ -15,15 +16,12 @@ namespace DirectionRegistration.Controllers
     {
         private RegistrationDbContext db = new RegistrationDbContext();
 
+        [LoginCheck]
         public ActionResult Index()
         {
             string currentStu = Session["currStu"] as string;
-            if (string.IsNullOrEmpty(currentStu))
-            {
-                return RedirectToAction("Login");
-            }
-
             Student stu = db.Students.SingleOrDefault(s => s.Number == currentStu);
+
             IndexViewModel model = new IndexViewModel();
             model.Id = stu.Id;
             model.Name = stu.Name;
@@ -64,6 +62,7 @@ namespace DirectionRegistration.Controllers
         }
 
         [HttpPost]
+        [LoginCheck]
         public ActionResult Save(DirectionSaveViewModel model)
         {
             if (isTimeOver()) return Json(new { code = 1, data = "填报已截止" });
@@ -182,27 +181,20 @@ namespace DirectionRegistration.Controllers
             return RedirectToAction("Login");
         }
 
+        [LoginCheck]
         public ActionResult ChangePassword()
         {
             string currentStu = Session["currStu"] as string;
             string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentStu) && string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login");
-            }
-            else if (string.IsNullOrEmpty(currentStu) == false)
+            var model = new ChangePasswordViewModel();
+            if (string.IsNullOrEmpty(currentStu) == false)
             {
                 var stu = db.Students.SingleOrDefault(s => s.Number == currentStu);
                 if (stu == null)
                 {
                     return RedirectToAction("Login");
                 }
-
-                var model = new ChangePasswordViewModel()
-                {
-                    Id = stu.Id
-                };
-                return View(model);
+                model.Id = stu.Id;
             }
             else
             {
@@ -211,16 +203,14 @@ namespace DirectionRegistration.Controllers
                 {
                     return RedirectToAction("Login");
                 }
+                model.Id = admin.Id;
+            }
 
-                var model = new ChangePasswordViewModel()
-                {
-                    Id = admin.Id
-                };
-                return View(model);
-            }            
+            return View(model);
         }
 
         [HttpPost]
+        [LoginCheck]
         public ActionResult ChangePassword(ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)

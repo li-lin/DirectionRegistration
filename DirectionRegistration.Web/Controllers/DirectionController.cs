@@ -6,9 +6,11 @@ using System.Web.Mvc;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
+    [AdminCheck]
     public class DirectionController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
@@ -17,12 +19,6 @@ namespace DirectionRegistration.Web.Controllers
 
         public ActionResult Index()
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             ViewBag.Teachers = getTeacherListItems();
 
             DirectionViewModel model = new DirectionViewModel();
@@ -37,12 +33,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Add(DirectionViewModel model)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             if (!isExistedDirection(model.Title))
             {
                 Teacher teacher = db.Teachers.SingleOrDefault(t => t.Id == model.TeacherId);
@@ -74,12 +64,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Delete(int Id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             var d = this.db.Directions.SingleOrDefault(dd => dd.Id == Id);
             if (d != null)
             {
@@ -96,12 +80,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpGet]
         public ActionResult Modify(int Id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Direction _direction = db.Directions.SingleOrDefault(d => d.Id == Id);
             DirectionViewModel model = new DirectionViewModel();
             if (_direction != null)
@@ -121,12 +99,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Modify(DirectionViewModel direction)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Direction _direction = db.Directions.SingleOrDefault(d => d.Id == direction.Id);
             if (_direction != null)
             {

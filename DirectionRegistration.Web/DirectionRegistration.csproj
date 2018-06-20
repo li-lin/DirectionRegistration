@@ -150,6 +150,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\TeacherController.cs" />
+    <Compile Include="Filters\AdminCheckAttribute.cs" />
     <Compile Include="Filters\LoginCheckAttribute.cs" />
     <Compile Include="Helper\CheckSuperHelper.cs" />
     <Compile Include="Helper\DirectionsDropdownListHelper.cs" />

@@ -6,9 +6,11 @@ using System.Web.Mvc;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
+    [AdminCheck]
     public class TeacherController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
@@ -17,12 +19,6 @@ namespace DirectionRegistration.Web.Controllers
 
         public ActionResult Index()
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             TeacherViewModel model = new TeacherViewModel();
             return View(model);
         }
@@ -35,12 +31,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Add(TeacherViewModel model)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             if (!isExistedTeacher(model.LoginName))
             {
                 Teacher d = new Teacher
@@ -71,12 +61,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Delete(int Id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Teacher d = this.db.Teachers.SingleOrDefault(dd => dd.Id == Id);
             if (d != null)
             {
@@ -93,12 +77,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpGet]
         public ActionResult Modify(int Id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Teacher _teacher = db.Teachers.SingleOrDefault(d => d.Id == Id);
             TeacherViewModel model = new TeacherViewModel();
             if (_teacher != null)
@@ -115,12 +93,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Modify(TeacherViewModel teacher)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Teacher _teacher = db.Teachers.SingleOrDefault(d => d.Id == teacher.Id);
             if (_teacher != null)
             {
@@ -136,12 +108,6 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult RePassword(int id)
         {
-            string currentAdmin = Session["admin"] as string;
-            if (string.IsNullOrEmpty(currentAdmin))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
             Teacher _teacher = db.Teachers.SingleOrDefault(d => d.Id == id);
             if (_teacher != null)
             {                

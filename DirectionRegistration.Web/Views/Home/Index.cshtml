@@ -1,13 +1,9 @@
 ﻿@model DirectionRegistration.Models.IndexViewModel
 @using DirectionRegistration.Models
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "方向填报";
 }
 
-<div class="alert alert-danger" style="display:none;" id="my-alert">
-    <button class="close" type="button">&times;</button>
-    <strong></strong>
-</div>
 <div class="page-header">
     <h3>方向填报 - [@Model.Name : @Model.Number]</h3>
 </div>
@@ -32,7 +28,7 @@
                 }
                 else
                 {
-                    <button id="btn-save" type="button" class="btn btn-primary btn-block btn-lg">保存</button>
+                    <button id="btn-ok" type="button" class="btn btn-primary btn-block btn-lg">保存</button>
                 }
             }
         </div>
@@ -42,14 +38,10 @@
 @section scripts{
     <script src="~/Scripts/Sortable.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {            
-            $('#my-alert .close').click(function () {
-                $('#my-alert').slideUp();
-            });
-
+        $(document).ready(function () {   
             prepareSortable();
 
-            $('#btn-save').click(function () {
+            $('#btn-ok').click(function () {
                 var b = confirm('请确认你的方向志愿填报?');
                 if (b) {
                     var udata = getValues();
@@ -61,9 +53,9 @@
                         contentType: 'application/json',
                         success: function (d) {
                             if (d.code == 0) {
-                                myAlert(d.data);
+                                toastr.success(d.data);
                             } else {
-                                myAlert(d.data);
+                                toastr.warning(d.data);
                             }
                         }
                     });
@@ -101,10 +93,6 @@
             value.Orders = orders;
             return value;
         }
-
-        function myAlert(info) {
-            $('#my-alert strong').text(info);
-            $('#my-alert').slideDown();
-        }
+        
     </script>
 }

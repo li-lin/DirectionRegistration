@@ -6,9 +6,11 @@ using System.Web.Mvc;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
+    [AdminCheck]
     public class CourseController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
