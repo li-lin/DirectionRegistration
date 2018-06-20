@@ -17,8 +17,7 @@ namespace DirectionRegistration.Repository.Entities
         public string Title { get; set; }
         public string Description { get; set; }
         public int Max { get; set; }
-        [Required]
-        public virtual Teacher Teacher { get; set; }
+        public int? TeacherId { get; set; }
         public virtual List<DirectionStudent> DirectionStudents { get; set; }
         public virtual List<DirectionCourse> DirectionCourses { get; set; }
     }

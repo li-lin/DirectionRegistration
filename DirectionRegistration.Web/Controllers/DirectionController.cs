@@ -40,7 +40,7 @@ namespace DirectionRegistration.Web.Controllers
                 {
                     return Json(new { code = 1, data = "未指定方向负责人" });
                 }
-                if (teacher.Direction != null)
+                if (teacher.DirectionId != null)
                 {
                     return Json(new { code = 1, data = "该负责人已指定负责方向" });
                 }
@@ -49,12 +49,15 @@ namespace DirectionRegistration.Web.Controllers
                 {
                     Title = model.Title,
                     Max = 35,
-                    Teacher = teacher
+                    TeacherId = teacher.Id
                 };
                 this.db.Directions.Add(d);
                 int i = this.db.SaveChanges();
+
                 if (i > 0)
                 {
+                    teacher.DirectionId = db.Directions.Single(dd => dd.Title == d.Title).Id;
+                    db.SaveChanges();
                     return PartialView("PartialDirectionList", bindDirectionViewModel());
                 }
             }
@@ -67,7 +70,20 @@ namespace DirectionRegistration.Web.Controllers
             var d = this.db.Directions.SingleOrDefault(dd => dd.Id == Id);
             if (d != null)
             {
+                //删除学生填选记录
+                var dirs = db.DirectionStudents.Where(ds => ds.Direction.Id == Id).ToList();
+                foreach(var dir in dirs)
+                {
+                    db.DirectionStudents.Remove(dir);
+                }
                 this.db.Directions.Remove(d);
+                //删除教师的方向负责人关系
+                var teacher = db.Teachers.SingleOrDefault(t => t.DirectionId == Id);
+                if (teacher != null)
+                {
+                    teacher.DirectionId = null;
+                }
+
                 int i = this.db.SaveChanges();
                 if (i == 0)
                 {
@@ -84,11 +100,19 @@ namespace DirectionRegistration.Web.Controllers
             DirectionViewModel model = new DirectionViewModel();
             if (_direction != null)
             {
+                var teacher = db.Teachers.SingleOrDefault(t => t.Id == _direction.TeacherId);
                 model.Id = _direction.Id;
                 model.Title = _direction.Title;
-                model.TeacherId = _direction.Teacher.Id;
-                model.TeacherName = _direction.Teacher.Name;
                 model.Max = _direction.Max;
+                if (teacher != null)
+                {
+                    model.TeacherId = _direction.TeacherId.Value;
+                    model.TeacherName = teacher.Name;
+                }
+                else
+                {
+                    model.TeacherId = 0;
+                }
             }
 
             ViewBag.Teachers = getTeacherListItems(model.TeacherId);
@@ -102,19 +126,24 @@ namespace DirectionRegistration.Web.Controllers
             Direction _direction = db.Directions.SingleOrDefault(d => d.Id == direction.Id);
             if (_direction != null)
             {
-                Teacher teacher = db.Teachers.SingleOrDefault(t => t.Id == direction.TeacherId);
-                if (teacher == null)
+                Teacher newTeacher = db.Teachers.SingleOrDefault(t => t.Id == direction.TeacherId);
+                if (newTeacher == null)
                 {
                     return Json(new { code = 1, data = "未指定方向负责人" });
                 }
-                if (teacher.Direction != null && teacher.Direction.Id != _direction.Id)
+                if (newTeacher.DirectionId != null && newTeacher.DirectionId != _direction.Id)
                 {
                     return Json(new { code = 1, data = "该负责人已指定负责方向" });
                 }
 
+                var oldTeacher = db.Teachers.SingleOrDefault(t => t.DirectionId == _direction.Id);
+                if (oldTeacher != null) oldTeacher.DirectionId = null;
+                newTeacher.DirectionId = _direction.Id;
+
                 _direction.Title = direction.Title;
-                _direction.Teacher = teacher;
+                _direction.TeacherId = newTeacher.Id;
                 _direction.Max = direction.Max;
+                
                 int i = db.SaveChanges();
                 return PartialView("PartialDirectionList", bindDirectionViewModel());
             }
@@ -127,14 +156,23 @@ namespace DirectionRegistration.Web.Controllers
             List<DirectionViewModel> m = new List<DirectionViewModel>();
             ds.ForEach(dd =>
             {
-                m.Add(new DirectionViewModel
+                var teacher = db.Teachers.SingleOrDefault(t => t.Id == dd.TeacherId);
+                var item = new DirectionViewModel
                 {
                     Id = dd.Id,
                     Title = dd.Title,
-                    TeacherId = dd.Teacher.Id,
-                    Max = dd.Max,
-                    TeacherName = dd.Teacher.Name
-                });
+                    TeacherId = dd.TeacherId ?? 0,
+                    Max = dd.Max
+                };
+                if (teacher != null)
+                {
+                    item.TeacherName = teacher.Name;
+                }
+                else
+                {
+                    item.TeacherName = "未指定";
+                }
+                m.Add(item);
             });
             return m;
         }

@@ -125,10 +125,11 @@ namespace DirectionRegistration.Web.Controllers
         {
             string currentAdmin = Session["admin"] as string;
 
-            List<Teacher> ds = this.db.Teachers.ToList();
+            List<Teacher> _teachers = this.db.Teachers.ToList();
             List<TeacherViewModel> teachers = new List<TeacherViewModel>();
-            foreach(var d in ds)
+            foreach(var d in _teachers)
             {
+                var direction = db.Directions.SingleOrDefault(dd => dd.Id == d.DirectionId);
                 teachers.Add(new TeacherViewModel
                 {
                     Id = d.Id,
@@ -136,7 +137,7 @@ namespace DirectionRegistration.Web.Controllers
                     Name = d.Name,
                     IsSuper = d.IsSuper,
                     IsSelf = d.LoginName == currentAdmin,
-                    DirectionName = d.Direction == null ? "无" : d.Direction.Title
+                    DirectionName = direction == null ? "无" : direction.Title
                 });
             }
             return teachers;

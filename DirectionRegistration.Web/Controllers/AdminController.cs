@@ -51,8 +51,8 @@ namespace DirectionRegistration.Web.Controllers
 
                 if (!teacher.IsSuper)
                 {
-                    int dirId = teacher.Direction.Id;
-                    if (reg.Selections[0].Id == dirId || reg.Selections[1].Id == dirId)
+                    int dirId = teacher.DirectionId ?? -1;
+                    if (reg.Selections[0].Id == dirId || reg.Selections[1].Id == dirId) //第一、二志愿
                         registrations.Add(reg);
                 }
                 else
@@ -65,7 +65,15 @@ namespace DirectionRegistration.Web.Controllers
             ViewBag.Now = registrations.Count;
             if (!teacher.IsSuper)
             {
-                ViewBag.DirName = teacher.Direction.Title;
+                var direction = db.Directions.SingleOrDefault(d => d.TeacherId == teacher.Id);
+                if (direction != null)
+                {
+                    ViewBag.DirName = direction.Title;
+                }
+                else
+                {
+                    return Content("<script>alert('你不是方向负责人，请联系管理员。');window.location.href='~/Home/Quit';</script>");
+                }
             }
             else
             {

@@ -25,6 +25,8 @@
             disp.html(d.data).addClass('text-success').removeClass('text-danger');
         } else if (d.code == 1) {
             disp.html(d.data).addClass('text-danger').removeClass('text-success');
+        } else {
+            window.location.href = '@Url.Action("Quit", "Home")';
         }
     }
 </script>

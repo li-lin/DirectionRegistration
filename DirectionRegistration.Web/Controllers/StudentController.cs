@@ -95,7 +95,13 @@ namespace DirectionRegistration.Web.Controllers
             Student d = db.Students.SingleOrDefault(dd => dd.Id == Id);
             if (d != null)
             {
-                this.db.Students.Remove(d);
+                var selections = db.DirectionStudents.Where(ds => ds.Student.Id == Id);
+                foreach(var selection in selections)
+                {
+                    db.DirectionStudents.Remove(selection);
+                }
+
+                db.Students.Remove(d);
                 int i = this.db.SaveChanges();
                 if (i == 0)
                 {

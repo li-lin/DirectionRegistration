@@ -114,14 +114,26 @@
                 var s = modal.attr('cust-submit');
                 if (t && t != "") {
                     modal.find('.modal-title').text(t);
-                    modal.find('.modal-body').load(u);
+
+                    $.get(u, function (data, status) {
+                        if (data.indexOf('<html>')>0) {
+                            window.location.href = '@Url.Action("Login","Home")';
+                        } else {
+                            modal.find('.modal-body').html(data);
+                        }
+                    });
+
                     var btn = modal.find('#btn-save');
                     if (s && s == "保存") {
                         btn.show();
                         btn.text(s).click(function () {
                             modal.find('form').submit();
                         });
-                    } else {
+                    } else if (s == "导入") {
+                        btn.show();
+                        btn.text(s);
+                    }
+                    else {
                         btn.hide();
                     }
                 } else {
