@@ -224,7 +224,7 @@ namespace DirectionRegistration.Web.Controllers
                         s.Name = dr["姓名"].ToString();
                         s.Gender = dr["性别"].ToString();
                         s.Major = dr["专业名称"].ToString();
-                        s.Password = "123456";
+                        s.Password = dr["身份证号"].ToString().Substring(12);
                         //判断导入学生信息是否与数据库中重复。
                         if (checkStudentExist(s.Number))
                         {

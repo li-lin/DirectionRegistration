@@ -11,20 +11,7 @@ namespace DirectionRegistration.Repository
     {
         public RegistrationDbContext()
         {
-            //Database.SetInitializer(new RegistrationDbInitialization());
-            if (this.Teachers.SingleOrDefault(a => a.LoginName == "jc_super") == null)
-            {
-                var admins = new List<Teacher>{
-                    new Teacher{
-                        LoginName="jc_super",
-                        Password="111111",
-                        Name="管理员",
-                        IsSuper=true                        
-                    }
-                };
-                admins.ForEach(a => this.Teachers.Add(a));
-                this.SaveChanges();
-            }
+            Database.SetInitializer(new ProductionLevelInitialization());            
         }
         public DbSet<Student> Students { get; set; }
         public DbSet<Direction> Directions { get; set; }

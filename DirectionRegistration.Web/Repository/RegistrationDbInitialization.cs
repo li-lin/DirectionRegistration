@@ -77,4 +77,33 @@ namespace DirectionRegistration.Repository
             context.SaveChanges();
         }
     }
+
+    //发布版本初始化器
+    public class ProductionLevelInitialization : IDatabaseInitializer<RegistrationDbContext>
+    {
+        public void InitializeDatabase(RegistrationDbContext context)
+        {
+            var super = context.Teachers.SingleOrDefault(t => t.LoginName == "jcsuper");
+            if (super == null)
+            {
+                var admins = new List<Teacher>{
+                    new Teacher{
+                        LoginName="jcsuper",
+                        Password="13141516",
+                        Name="管理员",
+                        IsSuper=true
+                    }
+                };
+                admins.ForEach(a => context.Teachers.Add(a));
+
+                var config = new ServerConfig()
+                {
+                    Deadline = DateTime.Now.AddDays(30)
+                };
+                context.ServerConfigurations.Add(config);
+
+                context.SaveChanges();
+            }
+        }
+    }
 }
