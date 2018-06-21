@@ -10,7 +10,7 @@ using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
-    [AdminCheck]
+    [SuperCheck]
     public class DirectionController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();

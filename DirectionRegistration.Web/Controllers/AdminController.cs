@@ -115,7 +115,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
         //下载学生志愿填报情况（Excel）
-        [AdminCheck]
+        [SuperCheck]
         public ActionResult DownloadData()
         {
             string currentAdmin = Session["admin"] as string;
@@ -125,7 +125,7 @@ namespace DirectionRegistration.Web.Controllers
             }
 
             string tempPath = Server.MapPath("~/Content/DownloadFiles/temp.xls");
-            string path = Server.MapPath("~/Content/DownloadFiles/方向志愿-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".xls");
+            string path = Server.MapPath("~/Content/DownloadFiles/" + (DateTime.Now.Year - 2) + "级方向志愿-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".xls");
             System.IO.File.Copy(tempPath, path);
 
             string connectionString = "Provider=Microsoft.Jet.OleDb.4.0; Data Source=" + path + "; Extended Properties=Excel 8.0;";
@@ -197,7 +197,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
         //设置截止日期
-        [AdminCheck]
+        [SuperCheck]
         public ActionResult Setting()
         {
             string currentAdmin = Session["admin"] as string;
@@ -221,7 +221,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
         [HttpPost]
-        [AdminCheck]
+        [SuperCheck]
         public ActionResult Setting(string deadline)
         {
             DateTime deadlineDt = DateTime.Now;

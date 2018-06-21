@@ -1,0 +1,17 @@
+﻿@using DirectionRegistration.Models
+@model IList<DirectionViewModel>
+@foreach (DirectionViewModel d in Model)
+{
+<tr>
+    <td class="col-md-3">@d.Title</td>
+    <td class="col-md-3">@d.Max</td>
+    <td class="col-md-3">@d.TeacherName</td>
+    <td class="col-md-3">
+        <button onclick="showModify('@d.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">修改</button>
+        @Ajax.ActionLink("删除", "Delete",
+            new { Id = d.Id },
+            new AjaxOptions() {HttpMethod="POST", OnSuccess= "onDelSuccess", LoadingElementId = "loading", Confirm="确定要删除吗？"},
+            new { @class = "btn btn-warning" })
+    </td>
+</tr>
+}

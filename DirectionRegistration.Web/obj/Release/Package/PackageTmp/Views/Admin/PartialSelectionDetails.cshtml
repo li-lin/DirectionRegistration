@@ -1,0 +1,25 @@
+﻿@model DirectionRegistration.Models.RegistrationViewModel
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">学生信息</h3>
+    </div>
+    <div class="panel-body">
+        <span class="label label-primary">@Model.Name</span>
+        <span class="label label-success">@Model.Gender</span>
+        <span class="label label-info">@Model.Major</span>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">志愿信息</h3>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            @foreach (var item in Model.Selections)
+            {
+                <li class="list-group-item col-sm-6"><span class="badge pull-left" style="background-color:olivedrab">@item.Order</span>@item.DirectionName</li>
+            }
+        </ul>
+    </div>
+</div>

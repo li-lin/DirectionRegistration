@@ -103,4 +103,4 @@ D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionR
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.pdb
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\EntityFramework.resources.dll
-D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csprojAssemblyReference.cache
+D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\EntityFramework.SqlServer.resources.dll

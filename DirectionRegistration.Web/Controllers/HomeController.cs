@@ -58,6 +58,7 @@ namespace DirectionRegistration.Controllers
             }
                       
             ViewBag.IsOverTime = isTimeOver();
+            ViewBag.Deadline = getDeadline();
             return View(model);
         }
 
@@ -229,7 +230,7 @@ namespace DirectionRegistration.Controllers
                         }
 
                         stu.Password = model.Password;
-                        db.Entry(stu).State = System.Data.EntityState.Modified;
+                        db.Entry(stu).State = System.Data.Entity.EntityState.Modified;
                         db.SaveChanges();
                         return Json(new { code = 0, data = "密码修改成功，请重新登录。" });
                     }
@@ -245,13 +246,25 @@ namespace DirectionRegistration.Controllers
                         }
 
                         admin.Password = model.Password;
-                        db.Entry(admin).State = System.Data.EntityState.Modified;
+                        db.Entry(admin).State = System.Data.Entity.EntityState.Modified;
                         db.SaveChanges();
                         return Json(new { code = 0, data = "密码修改成功，请重新登录。" });
                     }
                 }
             }
             return Json(new { code = 1, data = "密码修改失败" });
-        }        
+        }
+
+        private string getDeadline()
+        {
+            var deadline = DateTime.Now;
+            var config = db.ServerConfigurations.FirstOrDefault();
+            if (config != null)
+            {
+                deadline = config.Deadline;
+            }
+            string d = $"{deadline.Year}年{deadline.Month}月{deadline.Day}日{deadline.Hour}时{deadline.Minute}分{deadline.Second}秒";
+            return d;
+        }
     }
 }

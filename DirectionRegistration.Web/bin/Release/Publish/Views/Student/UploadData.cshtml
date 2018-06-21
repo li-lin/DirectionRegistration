@@ -1,0 +1,53 @@
+﻿<div class="container-fluid">
+    @using (Html.BeginForm("UploadData", "Student", FormMethod.Post, new { id = "formUpload", enctype = "multipart/form-data" })) 
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <div class="col-sm-12">
+                <p class="text-primary"><b>注意：</b>请下载改模板进行导入。<a href="~/Content/UploadFiles/template.xls" class="btn btn-default">下载</a></p>
+            </div>
+            <div class="col-sm-12">
+                <label for="files" class="control-label">学生数据文件（EXCEL）：</label>
+            </div>
+            <div class="col-sm-6">
+                <input id="uploadInput" type="file" name="files" accept="application/vnd.ms-excel" class="form-control btn" />
+            </div>
+            <div class="col-sm-6">
+                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        $("#btn-save").click(function () {
+            var loading = $('#loading');
+            if ($('#uploadInput').val().length>0) {
+                $("form#formUpload").ajaxSubmit({
+                    url: '@Url.Action("UploadData", "Student")',
+                    type: "post",
+                    beforeSubmit: function () {
+                        loading.show();
+                    },
+                    success: function (data) {
+                        loading.hide();                       
+                        if (data.code == "101") {
+                            toastr.success(data.msg);
+                            window.location.href = "@Url.Action("Index", "Student", new { ssid = Guid.NewGuid().ToString() })";
+                        } else {
+                            toastr.warning(data.msg);
+                        }
+                    },
+                    error: function (data) {
+                        loading.hide();
+                        toastr.error(data.msg);
+                    }
+                });
+            } else {
+                toastr.warning('请选择上传数据！');
+            }
+            return false;            
+        });        
+    });
+    
+</script>
