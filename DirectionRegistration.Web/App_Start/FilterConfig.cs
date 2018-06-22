@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using System.Web.Mvc;
+using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration
 {
@@ -7,7 +8,9 @@ namespace DirectionRegistration
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
-            filters.Add(new HandleErrorAttribute());
+            filters.Add(new CustHandleErrorAttribute());
+            //filters.Add(new LoginCheckAttribute());
+            //filters.Add(new SuperCheckAttribute());
         }
     }
 }

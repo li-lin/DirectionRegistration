@@ -148,6 +148,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\TeacherController.cs" />
+    <Compile Include="Filters\CustHandleErrorAttribute.cs" />
     <Compile Include="Filters\LoginCheckAttribute.cs" />
     <Compile Include="Filters\SuperCheckAttribute.cs" />
     <Compile Include="Helper\CheckSuperHelper.cs" />
@@ -242,6 +243,8 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Content\toastr.min.css" />
+    <Content Include="Error.html" />
+    <Content Include="logs\exps.txt" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

@@ -15,6 +15,7 @@ using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Web.Controllers
 {
+    [CustHandleError]
     public class AdminController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
@@ -29,7 +30,7 @@ namespace DirectionRegistration.Web.Controllers
             {
                 return RedirectToAction("Quit", "Home");
             }
-            
+
             List<RegistrationViewModel> registrations = new List<RegistrationViewModel>();
             var directionsByStudent = db.DirectionStudents.GroupBy(ds => ds.Student).ToList();
 

@@ -12,6 +12,7 @@ using DirectionRegistration.Web.Filters;
 
 namespace DirectionRegistration.Controllers
 {
+    [CustHandleError]
     public class HomeController : Controller
     {
         private RegistrationDbContext db = new RegistrationDbContext();
@@ -109,10 +110,7 @@ namespace DirectionRegistration.Controllers
                 if (tag == model.Orders.Count)
                 {
                     int i = db.SaveChanges();
-                    if (i > 0)
-                    {
-                        return Json(new { code = 0, data = "填报成功" });
-                    }
+                    return Json(new { code = 0, data = "填报成功" });
                 }
             }
             return Json(new { code = 1, data = "保存失败" });
