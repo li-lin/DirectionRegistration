@@ -30,7 +30,7 @@ namespace DirectionRegistration.Web.Controllers
             {
                 return RedirectToAction("Quit", "Home");
             }
-
+            
             List<RegistrationViewModel> registrations = new List<RegistrationViewModel>();
             var directionsByStudent = db.DirectionStudents.GroupBy(ds => ds.Student).ToList();
 
@@ -155,6 +155,41 @@ namespace DirectionRegistration.Web.Controllers
                 }
 
                 List<RegistrationViewModel> registrations = new List<RegistrationViewModel>();
+                int dirCount = db.Directions.Count();
+
+                var students = db.Students.OrderBy(s => s.DirectionStudents.Count).ToList();
+                foreach(var student in students)
+                {
+                    var reg = new RegistrationViewModel();
+                    reg.Id = student.Id;
+                    reg.Number = student.Number;
+                    reg.Name = student.Name;
+                    reg.Gender = student.Gender;
+                    reg.Major = student.Major;
+
+                    reg.Selections = student.DirectionStudents.OrderBy(ds => ds.Order).Select(dd => new DirectionInfoViewModel
+                    {
+                        Id = dd.Direction.Id,
+                        DirectionName = dd.Direction.Title,
+                        Order = dd.Order
+                    }).ToList();
+
+                    if (reg.Selections.Count == 0)
+                    {
+                        for(int i = 0; i < dirCount; i++)
+                        {
+                            reg.Selections.Add(new DirectionInfoViewModel
+                            {
+                                Id = 0,
+                                DirectionName = "未填报",
+                                Order = 0
+                            });
+                        }
+                    }
+
+                    registrations.Add(reg);
+                }
+                /*
                 var directionsByStudent = db.DirectionStudents.GroupBy(ds => ds.Student).ToList();
 
                 foreach (var group in directionsByStudent)
@@ -175,6 +210,7 @@ namespace DirectionRegistration.Web.Controllers
 
                     registrations.Add(reg);
                 }
+                */
 
                 string commandText = stringBuilder2.ToString() + stringBuilder3.ToString();
                 foreach (var s in registrations)
