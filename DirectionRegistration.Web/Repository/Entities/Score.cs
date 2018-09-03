@@ -12,15 +12,15 @@ namespace DirectionRegistration.Repository.Entities
         /// <summary>
         /// 成绩得分
         /// </summary>
-        public float Value { get; set; }
+        public float? Value { get; set; }
 
         /// <summary>
         /// 学生的课程
         /// </summary>
-        public Course Course { get; set; }
+        public virtual Course Course { get; set; }
         /// <summary>
         /// 学生
         /// </summary>
-        public Student Student { get; set; }
+        public virtual Student Student { get; set; }
     }
 }

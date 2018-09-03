@@ -17,6 +17,7 @@
                      new { Id = d.Id },
                      new AjaxOptions() { HttpMethod="POST", OnSuccess= "onRePasswordSuccess", LoadingElementId = "loading", Confirm = "确定要重置密码吗？" },
                      new { @class = "btn btn-danger" })
+        <button onclick="showScore('@d.Id')" class="btn btn-primary" data-toggle="modal" data-target="#myModal">成绩详情</button>
     </td>
 </tr>
 }

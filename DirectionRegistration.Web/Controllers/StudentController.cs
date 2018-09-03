@@ -77,9 +77,20 @@ namespace DirectionRegistration.Web.Controllers
             List<StudentInfoViewModel> data = new List<StudentInfoViewModel>();
             if (!string.IsNullOrEmpty(number))
             {
-                data = bindStudentsViewModel(getPageInfo(0)).Where(item => item.Number == number).ToList();
+                var students = db.Students.Where(item => item.Number == number).ToList();
+                foreach (var s in students)
+                {
+                    data.Add(new StudentInfoViewModel
+                    {
+                        Id = s.Id,
+                        Number = s.Number,
+                        Name = s.Name,
+                        Gender = s.Gender,
+                        Major = s.Major
+                    });
+                }
             }
-            return PartialView("PartialStudentList", data); ;
+            return PartialView("PartialStudentList", data); 
         }
 
         public ActionResult GetStudents(PagedStudentsViewModel model)
@@ -166,6 +177,23 @@ namespace DirectionRegistration.Web.Controllers
                 return Json(new { code = 0, data = "密码重置成功" });
             }
             return Json(new { code = 1, data = "密码重置失败" });
+        }
+
+        public ActionResult LoadScore(int id)
+        {
+            Student student = db.Students.SingleOrDefault(s => s.Id == id);
+            StudentScoreViewModel model = new StudentScoreViewModel();
+            if (student != null)
+            {
+                model.StudentName = student.Name;
+                model.Scores = student.Scores.Select(sc => new ScoreInfoViewModel
+                {
+                    ScoreName = sc.Course.CourseName,
+                    ScoreValue = sc.Value??0
+                }).ToList();
+                model.Total = model.Scores.Sum(sc => sc.ScoreValue);
+            }
+            return PartialView("PartialStudentScore", model);
         }
 
         public ActionResult UploadData()

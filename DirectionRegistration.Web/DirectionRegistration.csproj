@@ -146,6 +146,7 @@
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\DirectionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ScoreController.cs" />
     <Compile Include="Controllers\StudentController.cs" />
     <Compile Include="Controllers\TeacherController.cs" />
     <Compile Include="Filters\CustHandleErrorAttribute.cs" />
@@ -158,10 +159,13 @@
     <Compile Include="Models\DirectionInfoViewModel.cs" />
     <Compile Include="Models\DirectionSaveViewModel.cs" />
     <Compile Include="Models\DirectionViewModel.cs" />
+    <Compile Include="Models\GenerationResultViewModel.cs" />
     <Compile Include="Models\PagedStudentsViewModel.cs" />
     <Compile Include="Models\RegistrationViewModel.cs" />
+    <Compile Include="Models\ScoreInfoViewModel.cs" />
     <Compile Include="Models\SettingViewModel.cs" />
     <Compile Include="Models\StudentInfoViewModel.cs" />
+    <Compile Include="Models\StudentScoreViewModel.cs" />
     <Compile Include="Models\TeacherInfoViewModel.cs" />
     <Compile Include="Models\TeacherViewModel.cs" />
     <Compile Include="Repository\Entities\Course.cs" />
@@ -256,6 +260,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\UploadFiles\template.xls" />
+    <Content Include="Content\UploadFiles\template-score.xls" />
+    <Content Include="Content\DownloadFiles\tempGeneration.xls" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\SelectDirections2018.pubxml" />
     <None Include="Scripts\jquery-1.12.4.intellisense.js" />
@@ -311,6 +317,9 @@
     <Content Include="Views\Student\Index.cshtml" />
     <Content Include="Views\Student\PartialModifyStudent.cshtml" />
     <Content Include="Views\Student\PartialStudentList.cshtml" />
+    <Content Include="Views\Score\PartialUploadScore.cshtml" />
+    <Content Include="Views\Score\Index.cshtml" />
+    <Content Include="Views\Student\PartialStudentScore.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

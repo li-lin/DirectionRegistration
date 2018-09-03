@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "成绩管理";
+}
+
+<div class="page-header">
+    <h3>@ViewBag.Title</h3>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">学生成绩</h3>
+    </div>
+    <div class="panel-body">
+        @Html.ActionLink("导入成绩", "UploadScore", null, new { id = "btn-import-score", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
+        @Html.ActionLink("方向录取", "GenerateResult", null, new { id = "btn-export-result", @class = "btn btn-success",title="使用成绩优先算法，成绩高者先录取。" })
+        <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.form.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#btn-import-score').click(function () {
+                handleModal({
+                    title: '导入学生成绩',
+                    url: '@Url.Action("UploadScore", "Score")',
+                    submit: '导入'
+                });
+            });
+        });
+    </script>
+
+}

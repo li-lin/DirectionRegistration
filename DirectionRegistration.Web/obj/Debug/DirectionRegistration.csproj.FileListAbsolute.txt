@@ -88,6 +88,8 @@ D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Web.Razor
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Web.WebPages.xml
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Web.WebPages.Deployment.xml
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Web.WebPages.Razor.xml
+D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\EntityFramework.resources.dll
+D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\EntityFramework.SqlServer.resources.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.Net.Http.Formatting.resources.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.Web.Http.resources.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.Web.Http.WebHost.resources.dll
@@ -102,6 +104,4 @@ D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionR
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csproj.CopyComplete
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.pdb
-D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\EntityFramework.resources.dll
-D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\EntityFramework.SqlServer.resources.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csprojAssemblyReference.cache

@@ -70,6 +70,13 @@ namespace DirectionRegistration.Controllers
             if (isTimeOver()) return Json(new { code = 1, data = "填报已截止" });
 
             Student stu = db.Students.SingleOrDefault(s => s.Id == model.Sid);
+            //安全验证，如果当前提交的ID未与Session中学生ID一致，则强制退出，清空Session。
+            string stu_number = Session["currStu"] as string;
+            if (stu_number != stu.Number)
+            {
+                Session.Clear();
+                return Redirect(Url.Action("Login", "Home"));
+            }
             if (stu != null)
             {
                 int tag = 0;

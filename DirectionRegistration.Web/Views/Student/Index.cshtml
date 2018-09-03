@@ -134,6 +134,13 @@
                 });
         }
 
+        
+        function showScore(id) {
+            handleModal({
+                title: '成绩详情',
+                url: '@Url.Action("LoadScore","Student")' + '/' + id
+            });
+        }
 
         function showModify(id) {
             var url = '@Url.Action("Modify","Student")' + '/' + id;

@@ -1,0 +1,13 @@
+﻿@model DirectionRegistration.Models.StudentScoreViewModel
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">学生[@Model.StudentName]成绩</h3>
+    </div>
+    <div class="panel-body">
+       @foreach(var item in Model.Scores)
+       {
+           <h4>@item.ScoreName<span class="badge">@item.ScoreValue</span></h4>
+       }
+        <h4>总分<span class="badge" style="background-color:brown">@Model.Total</span></h4>
+    </div>
+</div>
