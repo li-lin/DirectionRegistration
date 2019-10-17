@@ -5,7 +5,7 @@
 <tr>
     <td class="col-md-3">@d.Title</td>
     <td class="col-md-3">@d.Max</td>
-    <td class="col-md-3">@d.TeacherName</td>
+    @*<td class="col-md-3">@d.TeacherName</td>*@
     <td class="col-md-3">
         <button onclick="showModify('@d.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">修改</button>
         @Ajax.ActionLink("删除", "Delete",

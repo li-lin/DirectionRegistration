@@ -73,7 +73,7 @@ namespace DirectionRegistration.Web.Controllers
                 }
                 else
                 {
-                    return Content("<script>alert('你不是方向负责人，请联系管理员。');window.location.href='~/Home/Quit';</script>");
+                    return Content("<script>alert('你不是方向负责人，请联系管理员。');window.location.href='Home/Quit';</script>");
                 }
             }
             else

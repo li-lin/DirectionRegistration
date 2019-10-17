@@ -10,7 +10,7 @@ namespace DirectionRegistration.Repository
     public class RegistrationDbInitialization : DropCreateDatabaseIfModelChanges<RegistrationDbContext>
     {
         protected override void Seed(RegistrationDbContext context)
-        {
+        {         
             base.Seed(context);
             var admins = new List<Teacher>{
                 new Teacher{

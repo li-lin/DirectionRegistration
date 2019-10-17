@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DirectionRegistration.Repository.Entities
 {
+    // 由于此版本只考虑对应关系，不考虑课程在方向中所占比重，因此作废此类。
     /// <summary>
     /// 方向与考核课程对应关系
     /// </summary>

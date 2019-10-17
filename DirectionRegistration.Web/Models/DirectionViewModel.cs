@@ -12,9 +12,11 @@ namespace DirectionRegistration.Models
         [Required(ErrorMessage="必填")]
         public string Title { get; set; }
 
-        public int TeacherId { get; set; }
-        [Required(ErrorMessage ="必填")]
-        public string TeacherName { get; set; }
+        //public int TeacherId { get; set; }
+        //[Required(ErrorMessage = "必填")]
+        //public string TeacherName { get; set; }
+
+        [Required(ErrorMessage = "必填")]
         public int Max { get; set; }
     }
 }

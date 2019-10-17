@@ -13,6 +13,19 @@
     </div>
     <div class="panel-body">
         <div class="col-sm-6 col-sm-offset-3">
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </div><!-- /btn-group -->
+                <input type="text" class="form-control" aria-label="...">
+            </div><!-- /input-group -->
             <ul id="dlist" style="padding:0px;font-weight:bold;font-size:1.0em;" class="list-group">
                 @{
                     foreach (var item in Model.Directions)
@@ -38,7 +51,7 @@
 @section scripts{
     <script src="~/Scripts/Sortable.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {   
+        $(document).ready(function () {
             prepareSortable();
 
             $('#btn-ok').click(function () {
@@ -59,7 +72,7 @@
                             }
                         }
                     });
-                }                
+                }
             });
         });
 
@@ -73,7 +86,7 @@
         }
 
         function freshOrders() {
-            var orders = $('#dlist span');            
+            var orders = $('#dlist span');
             for (var i = 0; i < orders.length; i++) {
                 orders[i].innerHTML = i + 1;
             }
@@ -93,6 +106,6 @@
             value.Orders = orders;
             return value;
         }
-        
+
     </script>
 }

@@ -62,7 +62,7 @@ namespace DirectionRegistration.Web.Controllers
                 }
                 else
                 {
-                    return Json(new { code = 1, data = "添加失败" });
+                    return Json(new { code = 1, data = "添加失败" }); 
                 }
             }
             else
@@ -252,7 +252,7 @@ namespace DirectionRegistration.Web.Controllers
                         s.Name = dr["姓名"].ToString();
                         s.Gender = dr["性别"].ToString();
                         s.Major = dr["专业名称"].ToString();
-                        s.Password = dr["身份证号"].ToString().Substring(12);
+                        s.Password = dr["出生日期"].ToString();//利用出生日期作为登录密码
                         //判断导入学生信息是否与数据库中重复。
                         if (checkStudentExist(s.Number))
                         {

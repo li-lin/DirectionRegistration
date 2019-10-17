@@ -11,7 +11,7 @@ namespace DirectionRegistration.Repository.Entities
         public Direction()
         {
             DirectionStudents = new List<DirectionStudent>();
-            DirectionCourses = new List<DirectionCourse>();
+            DirectionCourses = new List<Course>();
         }
         public int Id { get; set; }
         public string Title { get; set; }
@@ -19,6 +19,6 @@ namespace DirectionRegistration.Repository.Entities
         public int Max { get; set; }
         public int? TeacherId { get; set; }
         public virtual List<DirectionStudent> DirectionStudents { get; set; }
-        public virtual List<DirectionCourse> DirectionCourses { get; set; }
+        public virtual List<Course> DirectionCourses { get; set; }
     }
 }

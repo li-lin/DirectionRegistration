@@ -23,10 +23,12 @@ namespace DirectionRegistration.Controllers
             string currentStu = Session["currStu"] as string;
             Student stu = db.Students.SingleOrDefault(s => s.Number == currentStu);
 
-            IndexViewModel model = new IndexViewModel();
-            model.Id = stu.Id;
-            model.Name = stu.Name;
-            model.Number = stu.Number;
+            IndexViewModel model = new IndexViewModel
+            {
+                Id = stu.Id,
+                Name = stu.Name,
+                Number = stu.Number
+            };
 
             if (stu.DirectionStudents.Count == 0)
             {
@@ -58,8 +60,8 @@ namespace DirectionRegistration.Controllers
                 }
             }
                       
-            ViewBag.IsOverTime = isTimeOver();
-            ViewBag.Deadline = getDeadline();
+            ViewBag.IsOverTime = IsTimeOver;
+            ViewBag.Deadline = Deadline;
             return View(model);
         }
 
@@ -67,7 +69,7 @@ namespace DirectionRegistration.Controllers
         [LoginCheck]
         public ActionResult Save(DirectionSaveViewModel model)
         {
-            if (isTimeOver()) return Json(new { code = 1, data = "填报已截止" });
+            if (IsTimeOver) return Json(new { code = 1, data = "填报已截止" });
 
             Student stu = db.Students.SingleOrDefault(s => s.Id == model.Sid);
             //安全验证，如果当前提交的ID未与Session中学生ID一致，则强制退出，清空Session。
@@ -87,9 +89,11 @@ namespace DirectionRegistration.Controllers
                         var direction = db.Directions.SingleOrDefault(d => d.Id == item.Did);
                         if (direction != null)
                         {
-                            var dd = new DirectionStudent();
-                            dd.Order = item.Order;
-                            dd.Direction = direction;
+                            var dd = new DirectionStudent
+                            {
+                                Order = item.Order,
+                                Direction = direction
+                            };
 
                             stu.DirectionStudents.Add(dd);
                             tag++;
@@ -124,21 +128,24 @@ namespace DirectionRegistration.Controllers
         }
 
         //判断选填志愿是否结束。
-        private bool isTimeOver()
+        private bool IsTimeOver
         {
-            bool b = false;
-            var config = db.ServerConfigurations.FirstOrDefault();
-            if (config != null)
+            get
             {
-                DateTime deadline = config.Deadline;
-                if (DateTime.Now >= deadline)
+                bool b = false;
+                var config = db.ServerConfigurations.FirstOrDefault();
+                if (config != null)
                 {
-                    b = true;
+                    DateTime deadline = config.Deadline;
+                    if (DateTime.Now >= deadline)
+                    {
+                        b = true;
+                    }
                 }
+                return b;
             }
-            return b;
         }
-       
+
         public ActionResult Login()
         {
             var model = new LoginViewModel();
@@ -260,16 +267,19 @@ namespace DirectionRegistration.Controllers
             return Json(new { code = 1, data = "密码修改失败" });
         }
 
-        private string getDeadline()
+        private string Deadline
         {
-            var deadline = DateTime.Now;
-            var config = db.ServerConfigurations.FirstOrDefault();
-            if (config != null)
+            get
             {
-                deadline = config.Deadline;
+                var deadline = DateTime.Now;
+                var config = db.ServerConfigurations.FirstOrDefault();
+                if (config != null)
+                {
+                    deadline = config.Deadline;
+                }
+                string d = $"{deadline.Year}年{deadline.Month}月{deadline.Day}日{deadline.Hour}时{deadline.Minute}分{deadline.Second}秒";
+                return d;
             }
-            string d = $"{deadline.Year}年{deadline.Month}月{deadline.Day}日{deadline.Hour}时{deadline.Minute}分{deadline.Second}秒";
-            return d;
         }
     }
 }

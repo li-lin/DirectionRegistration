@@ -16,10 +16,11 @@ namespace DirectionRegistration.Web.Controllers
         private RegistrationDbContext db = new RegistrationDbContext();
         //
         // GET: /Direction/
+        // 暂时取消方向负责人信息
 
         public ActionResult Index()
         {
-            ViewBag.Teachers = getTeacherListItems();
+            //ViewBag.Teachers = getTeacherListItems();
 
             DirectionViewModel model = new DirectionViewModel();
             return View(model);
@@ -35,29 +36,29 @@ namespace DirectionRegistration.Web.Controllers
         {
             if (!isExistedDirection(model.Title))
             {
-                Teacher teacher = db.Teachers.SingleOrDefault(t => t.Id == model.TeacherId);
-                if (teacher == null)
-                {
-                    return Json(new { code = 1, data = "未指定方向负责人" });
-                }
-                if (teacher.DirectionId != null)
-                {
-                    return Json(new { code = 1, data = "该负责人已指定负责方向" });
-                }
+                //Teacher teacher = db.Teachers.SingleOrDefault(t => t.Id == model.TeacherId);
+                //if (teacher == null)
+                //{
+                //    return Json(new { code = 1, data = "未指定方向负责人" });
+                //}
+                //if (teacher.DirectionId != null)
+                //{
+                //    return Json(new { code = 1, data = "该负责人已指定负责方向" });
+                //}
 
                 Direction d = new Direction
                 {
                     Title = model.Title,
-                    Max = 35,
-                    TeacherId = teacher.Id
+                    Max = model.Max//,
+                    //TeacherId = teacher.Id
                 };
                 this.db.Directions.Add(d);
                 int i = this.db.SaveChanges();
 
                 if (i > 0)
                 {
-                    teacher.DirectionId = db.Directions.Single(dd => dd.Title == d.Title).Id;
-                    db.SaveChanges();
+                    //teacher.DirectionId = db.Directions.Single(dd => dd.Title == d.Title).Id;
+                    //db.SaveChanges();
                     return PartialView("PartialDirectionList", bindDirectionViewModel());
                 }
             }
@@ -78,11 +79,11 @@ namespace DirectionRegistration.Web.Controllers
                 }
                 this.db.Directions.Remove(d);
                 //删除教师的方向负责人关系
-                var teacher = db.Teachers.SingleOrDefault(t => t.DirectionId == Id);
-                if (teacher != null)
-                {
-                    teacher.DirectionId = null;
-                }
+                //var teacher = db.Teachers.SingleOrDefault(t => t.DirectionId == Id);
+                //if (teacher != null)
+                //{
+                //    teacher.DirectionId = null;
+                //}
 
                 int i = this.db.SaveChanges();
                 if (i == 0)
@@ -100,22 +101,22 @@ namespace DirectionRegistration.Web.Controllers
             DirectionViewModel model = new DirectionViewModel();
             if (_direction != null)
             {
-                var teacher = db.Teachers.SingleOrDefault(t => t.Id == _direction.TeacherId);
+                //var teacher = db.Teachers.SingleOrDefault(t => t.Id == _direction.TeacherId);
                 model.Id = _direction.Id;
                 model.Title = _direction.Title;
                 model.Max = _direction.Max;
-                if (teacher != null)
-                {
-                    model.TeacherId = _direction.TeacherId.Value;
-                    model.TeacherName = teacher.Name;
-                }
-                else
-                {
-                    model.TeacherId = 0;
-                }
+                //if (teacher != null)
+                //{
+                //    model.TeacherId = _direction.TeacherId.Value;
+                //    model.TeacherName = teacher.Name;
+                //}
+                //else
+                //{
+                //    model.TeacherId = 0;
+                //}
             }
 
-            ViewBag.Teachers = getTeacherListItems(model.TeacherId);
+            //ViewBag.Teachers = getTeacherListItems(model.TeacherId);
 
             return PartialView("PartialModifyDirection", model);
         }
@@ -126,22 +127,22 @@ namespace DirectionRegistration.Web.Controllers
             Direction _direction = db.Directions.SingleOrDefault(d => d.Id == direction.Id);
             if (_direction != null)
             {
-                Teacher newTeacher = db.Teachers.SingleOrDefault(t => t.Id == direction.TeacherId);
-                if (newTeacher == null)
-                {
-                    return Json(new { code = 1, data = "未指定方向负责人" });
-                }
-                if (newTeacher.DirectionId != null && newTeacher.DirectionId != _direction.Id)
-                {
-                    return Json(new { code = 1, data = "该负责人已指定负责方向" });
-                }
+                //Teacher newTeacher = db.Teachers.SingleOrDefault(t => t.Id == direction.TeacherId);
+                //if (newTeacher == null)
+                //{
+                //    return Json(new { code = 1, data = "未指定方向负责人" });
+                //}
+                //if (newTeacher.DirectionId != null && newTeacher.DirectionId != _direction.Id)
+                //{
+                //    return Json(new { code = 1, data = "该负责人已指定负责方向" });
+                //}
 
-                var oldTeacher = db.Teachers.SingleOrDefault(t => t.DirectionId == _direction.Id);
-                if (oldTeacher != null) oldTeacher.DirectionId = null;
-                newTeacher.DirectionId = _direction.Id;
+                //var oldTeacher = db.Teachers.SingleOrDefault(t => t.DirectionId == _direction.Id);
+                //if (oldTeacher != null) oldTeacher.DirectionId = null;
+                //newTeacher.DirectionId = _direction.Id;
 
                 _direction.Title = direction.Title;
-                _direction.TeacherId = newTeacher.Id;
+                //_direction.TeacherId = newTeacher.Id;
                 _direction.Max = direction.Max;
                 
                 int i = db.SaveChanges();
@@ -152,26 +153,26 @@ namespace DirectionRegistration.Web.Controllers
 
         private List<DirectionViewModel> bindDirectionViewModel()
         {
-            List<Direction> ds = this.db.Directions.ToList();
+            List<Direction> ds = db.Directions.ToList();
             List<DirectionViewModel> m = new List<DirectionViewModel>();
             ds.ForEach(dd =>
             {
-                var teacher = db.Teachers.SingleOrDefault(t => t.Id == dd.TeacherId);
+                //var teacher = db.Teachers.SingleOrDefault(t => t.Id == dd.TeacherId);
                 var item = new DirectionViewModel
                 {
                     Id = dd.Id,
                     Title = dd.Title,
-                    TeacherId = dd.TeacherId ?? 0,
+                    //TeacherId = dd.TeacherId ?? 0,
                     Max = dd.Max
                 };
-                if (teacher != null)
-                {
-                    item.TeacherName = teacher.Name;
-                }
-                else
-                {
-                    item.TeacherName = "未指定";
-                }
+                //if (teacher != null)
+                //{
+                //    item.TeacherName = teacher.Name;
+                //}
+                //else
+                //{
+                //    item.TeacherName = "未指定";
+                //}
                 m.Add(item);
             });
             return m;
@@ -188,37 +189,37 @@ namespace DirectionRegistration.Web.Controllers
             return b;
         }
 
-        private List<SelectListItem> getTeacherListItems(int? tid = null)
-        {
-            var teacherListItems = new List<SelectListItem>();
-            if (tid == null)
-            {
-                teacherListItems.Add(
-                    new SelectListItem()
-                    {
-                        Selected = true,
-                        Text = "方向负责人",
-                        Value = "0"
-                    }
-                );
-            }
+        //private List<SelectListItem> getTeacherListItems(int? tid = null)
+        //{
+        //    var teacherListItems = new List<SelectListItem>();
+        //    if (tid == null)
+        //    {
+        //        teacherListItems.Add(
+        //            new SelectListItem()
+        //            {
+        //                Selected = true,
+        //                Text = "方向负责人",
+        //                Value = "0"
+        //            }
+        //        );
+        //    }
 
-            var tlist = db.Teachers.ToList();
-            foreach (var d in tlist)
-            {
-                var item = new SelectListItem()
-                {
-                    Selected = false,
-                    Text = d.Name,
-                    Value = d.Id.ToString()
-                };
-                if (d.Id == tid)
-                {
-                    item.Selected = true;
-                }
-                teacherListItems.Add(item);
-            }
-            return teacherListItems;
-        }
+        //    var tlist = db.Teachers.ToList();
+        //    foreach (var d in tlist)
+        //    {
+        //        var item = new SelectListItem()
+        //        {
+        //            Selected = false,
+        //            Text = d.Name,
+        //            Value = d.Id.ToString()
+        //        };
+        //        if (d.Id == tid)
+        //        {
+        //            item.Selected = true;
+        //        }
+        //        teacherListItems.Add(item);
+        //    }
+        //    return teacherListItems;
+        //}
     }
 }
