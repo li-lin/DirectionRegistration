@@ -100,7 +100,6 @@ D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.W
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.Web.WebPages.resources.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.Web.WebPages.Deployment.resources.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.Web.WebPages.Razor.resources.dll
-D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csprojAssemblyReference.cache
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csproj.CopyComplete
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.pdb

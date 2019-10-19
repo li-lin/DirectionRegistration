@@ -1,0 +1,15 @@
+﻿@using DirectionRegistration.Models
+@model DirectionViewModel
+@foreach (var c in Model.Courses)
+{
+    <tr>
+        <td class="col-md-5">@c.CourseName</td>
+        <td class="col-md-4">@c.Proportion</td>
+        <td class="col-md-3">
+            @Ajax.ActionLink("删除", "DeleteCourse",
+                new { Cid = c.CourseId, Did=Model.Id },
+                new AjaxOptions() { HttpMethod = "POST", OnSuccess = "onDelCourseSuccess", LoadingElementId = "loading", Confirm = "确定要删除吗？" },
+                new { @class = "btn btn-warning" })
+        </td>
+    </tr>
+}

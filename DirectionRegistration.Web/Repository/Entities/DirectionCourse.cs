@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace DirectionRegistration.Repository.Entities
 {
-    // 由于此版本只考虑对应关系，不考虑课程在方向中所占比重，因此作废此类。
     /// <summary>
     /// 方向与考核课程对应关系
     /// </summary>
@@ -16,8 +16,9 @@ namespace DirectionRegistration.Repository.Entities
         public virtual Course Course { get; set; }
         public virtual Direction Direction { get; set; }
         /// <summary>
-        /// 课程在该方向所在比重
+        /// 课程在该方向所在比重，默认1.0，即成绩原值。
         /// </summary>
+        [DefaultValue(1.0)]
         public double Proportion { get; set; }
     }
 }

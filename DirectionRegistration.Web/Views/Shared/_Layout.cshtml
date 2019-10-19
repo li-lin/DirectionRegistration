@@ -13,6 +13,9 @@
             padding-top:50px;
             font-size:16px;
         }
+        .form-width-auto{
+            width:auto;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +108,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             toastr.options.positionClass = 'toast-top-center';
+            toastr.options.timeOut = 1000;
             var path = location.pathname;
             var navs = $('ul.navbar-nav li');
             for (var i = 0; i < navs.length; i++) {
@@ -133,7 +137,7 @@
                     var btn = modal.find('#btn-save');
                     if (s && s == "保存") {
                         btn.show();
-                        btn.text(s).click(function () {
+                        btn.text(s).one("click",function () {
                             modal.find('form').submit();
                         });
                     } else if (s == "导入") {
@@ -148,6 +152,8 @@
                 }
             }).on('hidden.bs.modal', function (e) {
                 var modal = $(this);
+                var btn = modal.find('#btn-save');
+                btn.off("click");
                 modal.find('.modal-title').empty();
                 modal.find('.modal-body').empty();
                 modal.attr('cust-title', '');

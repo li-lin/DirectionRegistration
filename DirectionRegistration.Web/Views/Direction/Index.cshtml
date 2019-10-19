@@ -19,19 +19,16 @@
     <div class="panel-body">
         @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAddSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
         {
-            <div class="form-group col-sm-4">
-                <label class="sr-only" for="courseName">方向名</label>
-                @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "方向名" })
-            </div>
-            <div class="form-group col-sm-4">
-                <label class="sr-only" for="courseName">上限人数</label>
-                @*@Html.DropDownListFor(model => model.TeacherId, ViewBag.Teachers as List<SelectListItem>, new { @class = "form-control" })*@   
-                @Html.TextBoxFor(model=>model.Max, new { @class="form-control", placeholder="上限人数"})
+            <div class="form-group">
+                <label for="Title">方向名</label>
+                @Html.TextBoxFor(model => model.Title, new { @class = "form-control form-width-auto", placeholder = "方向名" })
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-success">添加</button>
-                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+                <label for="Max">上限人数</label>
+                @Html.TextBoxFor(model => model.Max, new { @class = "form-control form-width-auto", placeholder = "上限人数" })
             </div>
+            <button type="submit" class="btn btn-success">添加</button>
+            <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
         }
     </div>
 </div>
@@ -45,7 +42,7 @@
                 <tr>
                     <th>方向名</th>
                     <th>人数上限</th>
-                    @*<th>负责人</th>*@
+                    <th>考核课程</th>
                     <th>操作</th>
                 </tr>
             </thead>

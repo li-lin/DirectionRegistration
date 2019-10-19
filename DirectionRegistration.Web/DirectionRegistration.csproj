@@ -322,6 +322,7 @@
     <Content Include="Views\Score\PartialUploadScore.cshtml" />
     <Content Include="Views\Score\Index.cshtml" />
     <Content Include="Views\Student\PartialStudentScore.cshtml" />
+    <Content Include="Views\Direction\PartialDirectionCourseList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -7,6 +7,7 @@ using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
 using DirectionRegistration.Web.Filters;
+using System.Web.Script.Serialization;
 
 namespace DirectionRegistration.Web.Controllers
 {
@@ -20,15 +21,13 @@ namespace DirectionRegistration.Web.Controllers
 
         public ActionResult Index()
         {
-            //ViewBag.Teachers = getTeacherListItems();
-
             DirectionViewModel model = new DirectionViewModel();
             return View(model);
         }
 
         public PartialViewResult GetDirections()
         {
-            return PartialView("PartialDirectionList", bindDirectionViewModel());
+            return PartialView("PartialDirectionList", BindDirectionsViewModel());
         }
 
         [HttpPost]
@@ -36,30 +35,17 @@ namespace DirectionRegistration.Web.Controllers
         {
             if (!isExistedDirection(model.Title))
             {
-                //Teacher teacher = db.Teachers.SingleOrDefault(t => t.Id == model.TeacherId);
-                //if (teacher == null)
-                //{
-                //    return Json(new { code = 1, data = "未指定方向负责人" });
-                //}
-                //if (teacher.DirectionId != null)
-                //{
-                //    return Json(new { code = 1, data = "该负责人已指定负责方向" });
-                //}
-
                 Direction d = new Direction
                 {
                     Title = model.Title,
-                    Max = model.Max//,
-                    //TeacherId = teacher.Id
+                    Max = model.Max
                 };
-                this.db.Directions.Add(d);
-                int i = this.db.SaveChanges();
+                db.Directions.Add(d);
+                int i = db.SaveChanges();
 
                 if (i > 0)
                 {
-                    //teacher.DirectionId = db.Directions.Single(dd => dd.Title == d.Title).Id;
-                    //db.SaveChanges();
-                    return PartialView("PartialDirectionList", bindDirectionViewModel());
+                    return PartialView("PartialDirectionList", BindDirectionsViewModel());
                 }
             }
             return Json(new { code = 1, data = "添加失败" });
@@ -73,50 +59,30 @@ namespace DirectionRegistration.Web.Controllers
             {
                 //删除学生填选记录
                 var dirs = db.DirectionStudents.Where(ds => ds.Direction.Id == Id).ToList();
-                foreach(var dir in dirs)
-                {
-                    db.DirectionStudents.Remove(dir);
-                }
-                this.db.Directions.Remove(d);
-                //删除教师的方向负责人关系
-                //var teacher = db.Teachers.SingleOrDefault(t => t.DirectionId == Id);
-                //if (teacher != null)
-                //{
-                //    teacher.DirectionId = null;
-                //}
+                db.DirectionStudents.RemoveRange(dirs);
 
-                int i = this.db.SaveChanges();
+                //删除课程与方向的对应关系
+                var dcs = db.DirectionCourses.Where(dc => dc.Direction.Id == Id).ToList();
+                db.DirectionCourses.RemoveRange(dcs);
+
+                db.Directions.Remove(d);
+
+                int i = db.SaveChanges();
                 if (i == 0)
                 {
                     return Json(new { code = 1, data = "删除失败" });
                 }
             }
-            return PartialView("PartialDirectionList", bindDirectionViewModel());
+            return PartialView("PartialDirectionList", BindDirectionsViewModel());
         }
 
         [HttpGet]
         public ActionResult Modify(int Id)
         {
             Direction _direction = db.Directions.SingleOrDefault(d => d.Id == Id);
-            DirectionViewModel model = new DirectionViewModel();
-            if (_direction != null)
-            {
-                //var teacher = db.Teachers.SingleOrDefault(t => t.Id == _direction.TeacherId);
-                model.Id = _direction.Id;
-                model.Title = _direction.Title;
-                model.Max = _direction.Max;
-                //if (teacher != null)
-                //{
-                //    model.TeacherId = _direction.TeacherId.Value;
-                //    model.TeacherName = teacher.Name;
-                //}
-                //else
-                //{
-                //    model.TeacherId = 0;
-                //}
-            }
+            DirectionViewModel model = BindDirectionViewModel(_direction);
 
-            //ViewBag.Teachers = getTeacherListItems(model.TeacherId);
+            ViewBag.Courses = GetCourseSelectListItems();
 
             return PartialView("PartialModifyDirection", model);
         }
@@ -127,55 +93,108 @@ namespace DirectionRegistration.Web.Controllers
             Direction _direction = db.Directions.SingleOrDefault(d => d.Id == direction.Id);
             if (_direction != null)
             {
-                //Teacher newTeacher = db.Teachers.SingleOrDefault(t => t.Id == direction.TeacherId);
-                //if (newTeacher == null)
-                //{
-                //    return Json(new { code = 1, data = "未指定方向负责人" });
-                //}
-                //if (newTeacher.DirectionId != null && newTeacher.DirectionId != _direction.Id)
-                //{
-                //    return Json(new { code = 1, data = "该负责人已指定负责方向" });
-                //}
-
-                //var oldTeacher = db.Teachers.SingleOrDefault(t => t.DirectionId == _direction.Id);
-                //if (oldTeacher != null) oldTeacher.DirectionId = null;
-                //newTeacher.DirectionId = _direction.Id;
-
                 _direction.Title = direction.Title;
-                //_direction.TeacherId = newTeacher.Id;
                 _direction.Max = direction.Max;
                 
                 int i = db.SaveChanges();
-                return PartialView("PartialDirectionList", bindDirectionViewModel());
+                return PartialView("PartialDirectionList", BindDirectionsViewModel());
             }
             return Json(new { code = 1, data = "修改失败" });
         }
 
-        private List<DirectionViewModel> bindDirectionViewModel()
+        /// <summary>
+        /// 删除指定方向的指定考核课程
+        /// </summary>
+        [HttpPost]
+        public ActionResult DeleteCourse(int Cid, int Did)
+        {
+            var dc = db.DirectionCourses.SingleOrDefault(d => d.Direction.Id == Did && d.Course.Id == Cid);
+            if (dc != null)
+            {
+                db.DirectionCourses.Remove(dc);
+                db.SaveChanges();
+                var direction = db.Directions.SingleOrDefault(d => d.Id == Did);
+                if (direction != null)
+                {
+                    return PartialView("PartialDirectionCourseList", BindDirectionViewModel(direction));
+                }
+            }
+            return Json(new { code = 1, data = "删除失败" });
+        }
+
+        [HttpPost]
+        public ActionResult AddCourseToDirection(string dcData)
+        {
+            var serializer = new JavaScriptSerializer();
+            var queryData = serializer.Deserialize<DirectionCourseAdderModel>(dcData);
+            var direction = db.Directions.SingleOrDefault(d => d.Id == queryData.Did);
+            var course = db.Courses.SingleOrDefault(c => c.Id == queryData.Cid);
+            if (direction != null && course != null)
+            {
+                if (direction.DirectionCourses.Exists(dc => dc.Course.Id == course.Id)==false)
+                {
+                    db.DirectionCourses.Add(new DirectionCourse
+                    {
+                        Direction = direction,
+                        Course = course,
+                        Proportion = queryData.Proportion
+                    });
+                    db.SaveChanges();
+                    return PartialView("PartialDirectionCourseList", BindDirectionViewModel(direction));
+                }
+                else
+                {
+                    return Json(new { code = 1, data = "该课程已存在" });
+                }
+
+            }
+            return Json(new { code = 1, data = "添加失败" });
+        }
+
+        public PartialViewResult GetDirectionCourses(int did)
+        {
+            Direction direction = db.Directions.SingleOrDefault(d => d.Id == did);
+            return PartialView("PartialDirectionCourseList", BindDirectionViewModel(direction));
+        }
+        /// <summary>
+        /// 装载方向列表信息到视图模型列表
+        /// </summary>
+        private List<DirectionViewModel> BindDirectionsViewModel()
         {
             List<Direction> ds = db.Directions.ToList();
-            List<DirectionViewModel> m = new List<DirectionViewModel>();
+            List<DirectionViewModel> m = new List<DirectionViewModel>();           
+
             ds.ForEach(dd =>
             {
-                //var teacher = db.Teachers.SingleOrDefault(t => t.Id == dd.TeacherId);
-                var item = new DirectionViewModel
-                {
-                    Id = dd.Id,
-                    Title = dd.Title,
-                    //TeacherId = dd.TeacherId ?? 0,
-                    Max = dd.Max
-                };
-                //if (teacher != null)
-                //{
-                //    item.TeacherName = teacher.Name;
-                //}
-                //else
-                //{
-                //    item.TeacherName = "未指定";
-                //}
+                var item = BindDirectionViewModel(dd);
                 m.Add(item);
             });
             return m;
+        }
+
+        /// <summary>
+        /// 装载方向信息到视图模型
+        /// </summary>
+        private DirectionViewModel BindDirectionViewModel(Direction dd)
+        {
+            var item = new DirectionViewModel
+            {
+                Id = dd.Id,
+                Title = dd.Title,
+                Max = dd.Max
+            };
+            //装载该方向对应的考核课程信息
+            item.Courses = new List<DirectionCoursesViewModel>();
+            foreach (var dc in dd.DirectionCourses)
+            {
+                item.Courses.Add(new DirectionCoursesViewModel()
+                {
+                    CourseId = dc.Course.Id,
+                    CourseName = dc.Course.CourseName,
+                    Proportion = dc.Proportion
+                });
+            }
+            return item;
         }
         
         private bool isExistedDirection(string directionName)
@@ -189,6 +208,32 @@ namespace DirectionRegistration.Web.Controllers
             return b;
         }
 
+        /// <summary>
+        /// 获取所有课程信息，用以填充方向考核课程选择下拉列表。
+        /// </summary>
+        private List<SelectListItem> GetCourseSelectListItems()
+        {
+            var courses = db.Courses;
+            List<SelectListItem> coursesListItems = new List<SelectListItem>();
+
+            foreach (var course in courses)
+            {
+                coursesListItems.Add(new SelectListItem()
+                {
+                    Value = course.Id.ToString(),
+                    Text = course.CourseName
+                });
+            }
+            if (courses.Count() == 0)
+            {
+                coursesListItems.Add(new SelectListItem()
+                {
+                    Value ="暂无课程",
+                    Text = "暂无课程"
+                });
+            }
+            return coursesListItems;
+        }
         //private List<SelectListItem> getTeacherListItems(int? tid = null)
         //{
         //    var teacherListItems = new List<SelectListItem>();
@@ -222,4 +267,11 @@ namespace DirectionRegistration.Web.Controllers
         //    return teacherListItems;
         //}
     }
+}
+
+class DirectionCourseAdderModel
+{
+    public int Cid { get; set; }
+    public int Did { get; set; }
+    public double Proportion { get; set; }
 }
