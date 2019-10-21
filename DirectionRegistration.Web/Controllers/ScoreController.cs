@@ -205,89 +205,7 @@ namespace DirectionRegistration.Web.Controllers
                 connection.Close();
             }
             return File(path, "application/vnd.ms-excel", path.Substring(path.LastIndexOf("\\")));
-        }
-
-        //录取，以分数优先，由于算法发生改变，该生成算法作废。
-        /*
-        private List<GenerationResultViewModel> GenerateOld()
-        {
-            List<GenerationResultViewModel> result = db.Students.Select(stu => new GenerationResultViewModel
-            {
-                StudentScore = new StudentScoreViewModel
-                {
-                    StudentId = stu.Id,
-                    StudentNumber = stu.Number,
-                    StudentName = stu.Name,
-                    StudentGender = stu.Gender,
-                    StudentMajor = stu.Major,
-                    Scores = stu.Scores.Select(sc => new ScoreInfoViewModel
-                    {
-                        ScoreName = sc.Course.CourseName,
-                        ScoreValue = sc.Value ?? 0
-                    }).ToList()
-                },
-                Selections = stu.DirectionStudents
-                .Where(ds => ds.Order > 0) //只取出前5个志愿，其他志愿Order属性为0，表示未选择的志愿。
-                .OrderBy(ds => ds.Order)
-                .Select(ds => new DirectionInfoViewModel
-                {
-                    Id = ds.Direction.Id,
-                    DirectionName = ds.Direction.Title,
-                    Order = ds.Order
-                }).ToList()
-            }).ToList();
-
-            int courseCount = db.Courses.Count();
-            foreach(var r in result)
-            {
-                r.StudentScore.Total = r.StudentScore.Scores.Sum(sc => sc.ScoreValue);
-                if(r.StudentScore.Scores.Count< courseCount)
-                {
-                    foreach (var course in db.Courses.ToArray())
-                    {
-                        if(r.StudentScore.Scores.SingleOrDefault(sc=>sc.ScoreName== course.CourseName) == null)
-                        {
-                            r.StudentScore.Scores.Add(new ScoreInfoViewModel
-                            {
-                                ScoreName = course.CourseName,
-                                ScoreValue = 0
-                            });
-                        }
-                    }
-                }
-            }
-            result = result.OrderByDescending(r => r.StudentScore.Total).ToList();
-
-            List<RegDirectionInfoModel> directions = db.Directions.Select(d => new RegDirectionInfoModel
-            {
-                DirectionId = d.Id,
-                DirectionName = d.Title,
-                Max = d.Max,
-                Count = 0
-            }).ToList();
-
-
-            foreach(var stu in result)
-            {
-                if (String.IsNullOrEmpty(stu.DirectionName))
-                {
-                    foreach (var selection in stu.Selections)
-                    {
-                        var dir = directions.SingleOrDefault(d => d.DirectionId == selection.Id);
-                        if (dir.Count < dir.Max)
-                        {
-                            stu.DirectionName = dir.DirectionName;
-                            stu.DirectionOrder = selection.Order;
-                            dir.Count++;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return result;
-        }
-        */
+        }       
 
         /**
          * 通过两轮志愿进行录取
@@ -313,7 +231,6 @@ namespace DirectionRegistration.Web.Controllers
                     }).ToList()
                 },
                 Selections = stu.DirectionStudents
-                .Where(ds => ds.Order > 0) //只取出前5个志愿，其他志愿Order属性为0，表示未选择的志愿。
                 .OrderBy(ds => ds.Order)
                 .Select(ds => new DirectionInfoViewModel
                 {

@@ -9,15 +9,15 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">方向列表<span class="pull-right" style="color:red;"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>拖动鼠标进行排序，以确定第1-5志愿顺序。</span></h3>
+        <h3 class="panel-title">方向列表<span class="pull-right" style="color:red;"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>拖动鼠标进行排序，以确定志愿顺序。</span></h3>
     </div>
     <div class="panel-body">
         <div class="col-sm-6 col-sm-offset-3">
-            <ul id="dlist" style="padding:0px;font-weight:bold;font-size:1.0em;" class="list-group">
+            <ul id="dlist" style="padding:0px;font-weight:bold;" class="list-group">
                 @{
                     foreach (var item in Model.Directions)
                     {
-                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer;margin-bottom:2px;">
+                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer;">
                             <span class="badge pull-left" style="background-color:brown;margin-right:6px;">@item.Order</span>
                             <p style="font-size:1em;">@item.DirectionName</p>
                         </li>
@@ -27,7 +27,7 @@
             @{
                 if ((bool)ViewBag.IsOverTime)
                 {
-                        <button type="button" class="btn btn-primary btn-block btn-lg disabled">确认志愿（填报结束）</button>
+                    <button type="button" class="btn btn-primary btn-block btn-lg disabled">确认志愿（填报结束）</button>
                 }
                 else
                 {
@@ -79,15 +79,9 @@
         function freshOrders() {
             var orders = $('#dlist span');
             for (var i = 0; i < orders.length; i++) {
-                if (i > 4) {
-                    orders[i].innerHTML = 0;
-                    orders[i].style.backgroundColor = "green";
-                    orders[i].parentElement.style.borderColor = "#dddddd";
-                } else {
-                    orders[i].innerHTML = i + 1;
-                    orders[i].style.backgroundColor = "brown";
-                    orders[i].parentElement.style.borderColor = "brown";
-                }
+                orders[i].innerHTML = i + 1;
+                orders[i].style.backgroundColor = "brown";
+                orders[i].parentElement.style.borderColor = "brown";
             }
         }
 
