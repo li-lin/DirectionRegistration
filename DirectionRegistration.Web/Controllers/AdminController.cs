@@ -93,13 +93,13 @@ namespace DirectionRegistration.Web.Controllers
             var student = db.Students.SingleOrDefault(s => s.Id == id);
             if (student != null)
             {
-                var directionsByStudent = db.DirectionStudents.Where(ds => ds.Student.Id == id).OrderBy(ds => ds.Order).ToList();
+                var directionsByStudent = db.DirectionStudents.Where(ds => ds.Student.Id == id && ds.Order > 0).OrderBy(ds => ds.Order).ToList();
                 selection.Id = student.Id;
                 selection.Number = student.Number;
                 selection.Name = student.Name;
                 selection.Gender = student.Gender;
                 selection.Major = student.Major;
-                foreach(var dir in directionsByStudent)
+                foreach (var dir in directionsByStudent)
                 {
                     selection.Selections.Add(new DirectionInfoViewModel
                     {

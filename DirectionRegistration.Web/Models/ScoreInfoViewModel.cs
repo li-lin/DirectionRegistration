@@ -8,6 +8,6 @@ namespace DirectionRegistration.Models
     public class ScoreInfoViewModel
     {
         public string ScoreName { get; set; }
-        public float ScoreValue { get; set; }
+        public double ScoreValue { get; set; }
     }
 }

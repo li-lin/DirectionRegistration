@@ -103,4 +103,3 @@ D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\zh-Hans\System.W
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csproj.CopyComplete
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.Web.pdb
-D:\Projects\DirectionRegistration\DirectionRegistration.Web\obj\Debug\DirectionRegistration.csprojAssemblyReference.cache

@@ -161,7 +161,7 @@
     <Compile Include="Models\DirectionInfoViewModel.cs" />
     <Compile Include="Models\DirectionSaveViewModel.cs" />
     <Compile Include="Models\DirectionViewModel.cs" />
-    <Compile Include="Models\GenerationResultViewModel.cs" />
+    <Compile Include="Models\GenerationResultModel.cs" />
     <Compile Include="Models\PagedStudentsViewModel.cs" />
     <Compile Include="Models\RegistrationViewModel.cs" />
     <Compile Include="Models\ScoreInfoViewModel.cs" />

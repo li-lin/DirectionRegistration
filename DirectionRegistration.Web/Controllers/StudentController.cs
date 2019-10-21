@@ -23,7 +23,7 @@ namespace DirectionRegistration.Web.Controllers
         {
             StudentInfoViewModel model = new StudentInfoViewModel();
             List<SelectListItem> majorList = new List<SelectListItem>();
-            foreach(string s in getMajors())
+            foreach(string s in GetMajors())
             {
                 majorList.Add(new SelectListItem
                 {
@@ -34,7 +34,7 @@ namespace DirectionRegistration.Web.Controllers
             }
             ViewBag.Majors = majorList;
 
-            var pageInfo = getPageInfo(0);
+            var pageInfo = GetPageInfo(0);
             ViewBag.PageNumber = pageInfo.PageNumber;
             ViewBag.PageCount = pageInfo.PageCount;
 
@@ -44,7 +44,7 @@ namespace DirectionRegistration.Web.Controllers
         [HttpPost]
         public ActionResult Add(StudentInfoViewModel model)
         {
-            if (!checkStudentExist(model.Number))
+            if (!CheckStudentExist(model.Number))
             {
                 Student student = new Student
                 {
@@ -58,7 +58,7 @@ namespace DirectionRegistration.Web.Controllers
                 int i = db.SaveChanges();
                 if (i > 0)
                 {
-                    return PartialView("PartialStudentList", bindStudentsViewModel(getPageInfo(0)));
+                    return PartialView("PartialStudentList", BindStudentsViewModel(GetPageInfo(0)));
                 }
                 else
                 {
@@ -96,7 +96,7 @@ namespace DirectionRegistration.Web.Controllers
         public ActionResult GetStudents(PagedStudentsViewModel model)
         {
             List<StudentInfoViewModel> data = null;
-            data = bindStudentsViewModel(getPageInfo(model.PageNumber));
+            data = BindStudentsViewModel(GetPageInfo(model.PageNumber));
             return PartialView("PartialStudentList", data);
         }
 
@@ -119,7 +119,7 @@ namespace DirectionRegistration.Web.Controllers
                     return Json(new { code = 1, data = "删除失败" });
                 }
             }
-            return PartialView("PartialStudentList", bindStudentsViewModel(getPageInfo(0)));
+            return PartialView("PartialStudentList", BindStudentsViewModel(GetPageInfo(0)));
         }
 
         [HttpGet]
@@ -136,7 +136,7 @@ namespace DirectionRegistration.Web.Controllers
                 model.Major = _student.Major;
             }
             List<SelectListItem> majorList = new List<SelectListItem>();
-            foreach (string s in getMajors())
+            foreach (string s in GetMajors())
             {
                 majorList.Add(new SelectListItem
                 {
@@ -161,7 +161,7 @@ namespace DirectionRegistration.Web.Controllers
                 _student.Gender = student.Gender;
                 _student.Major = student.Major;
                 db.SaveChanges();
-                return PartialView("PartialStudentList", bindStudentsViewModel(getPageInfo(0)));
+                return PartialView("PartialStudentList", BindStudentsViewModel(GetPageInfo(0)));
             }
             return Json(new { code = 1, data = "修改失败" });
         }
@@ -216,7 +216,7 @@ namespace DirectionRegistration.Web.Controllers
                         string path = Server.MapPath("~/Content/UploadFiles/" + newFileName);
                         file.SaveAs(path);
 
-                        int b = importStudentsFromExcel(path);
+                        int b = ImportStudentsFromExcel(path);
                         if (b == 1)
                         {
                             return Json(new { code = "101", msg = "学生数据导入成功。" });
@@ -231,7 +231,7 @@ namespace DirectionRegistration.Web.Controllers
             return Json(new { code = "100", msg = "学生数据上传或导入失败。" });
         }
 
-        private int importStudentsFromExcel(string path)
+        private int ImportStudentsFromExcel(string path)
         {
             int result = 0;//0：失败
             string connectionString = "Provider=Microsoft.Jet.OleDb.4.0; Data Source=" + path + "; Extended Properties=Excel 8.0;";
@@ -254,7 +254,7 @@ namespace DirectionRegistration.Web.Controllers
                         s.Major = dr["专业名称"].ToString();
                         s.Password = dr["出生日期"].ToString();//利用出生日期作为登录密码
                         //判断导入学生信息是否与数据库中重复。
-                        if (checkStudentExist(s.Number))
+                        if (CheckStudentExist(s.Number))
                         {
                             //return 2;//2：数据重复
                             continue;
@@ -268,7 +268,7 @@ namespace DirectionRegistration.Web.Controllers
             return result;
         }
 
-        private bool checkStudentExist(string number)
+        private bool CheckStudentExist(string number)
         {
             bool r = false;
             int ss = this.db.Students.Count(s => s.Number == number);
@@ -276,12 +276,12 @@ namespace DirectionRegistration.Web.Controllers
             return r;
         }
 
-        private List<String> getMajors()
+        private List<String> GetMajors()
         {
             return db.Students.Select(s => s.Major).Distinct().ToList();
         }
 
-        private PagedStudentsViewModel getPageInfo(int pageNumber)
+        private PagedStudentsViewModel GetPageInfo(int pageNumber)
         {
             int all = db.Students.Count();
             int pageSize = 18;
@@ -293,7 +293,7 @@ namespace DirectionRegistration.Web.Controllers
             };
         }
 
-        private List<StudentInfoViewModel> bindStudentsViewModel(int? pageNumber,int pageSize=20)
+        private List<StudentInfoViewModel> BindStudentsViewModel(int? pageNumber,int pageSize=20)
         {
             int pageNum = pageNumber ?? 0;
             var students = db.Students.OrderBy(s => s.Number).Skip(pageNum * pageSize).Take(pageSize).ToList();
@@ -313,9 +313,9 @@ namespace DirectionRegistration.Web.Controllers
             return model;
         }
 
-        private List<StudentInfoViewModel> bindStudentsViewModel(PagedStudentsViewModel arg)
+        private List<StudentInfoViewModel> BindStudentsViewModel(PagedStudentsViewModel arg)
         {
-            return bindStudentsViewModel(arg.PageNumber, arg.PageSize);
+            return BindStudentsViewModel(arg.PageNumber, arg.PageSize);
         }
     }
 }

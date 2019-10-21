@@ -17,6 +17,6 @@ namespace DirectionRegistration.Models
         public string StudentGender { get; set; }
         public string StudentName { get; set; }
         public List<ScoreInfoViewModel> Scores { get; set; } 
-        public float Total { get; set; }
+        public double Total { get; set; }
     }
 }

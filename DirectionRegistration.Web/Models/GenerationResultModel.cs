@@ -5,9 +5,9 @@ using System.Web;
 
 namespace DirectionRegistration.Models
 {
-    public class GenerationResultViewModel
+    public class GenerationResultModel
     {
-        public GenerationResultViewModel()
+        public GenerationResultModel()
         {
             Selections = new List<DirectionInfoViewModel>();
         }
