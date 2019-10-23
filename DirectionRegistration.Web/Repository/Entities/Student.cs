@@ -21,17 +21,13 @@ namespace DirectionRegistration.Repository.Entities
         public string Major { get; set; }
 
         public virtual List<Score> Scores { get; set; }
+        /// <summary>
+        /// 该学生方向填报情况
+        /// </summary>
         public virtual List<DirectionStudent> DirectionStudents { get; set; }
-
-        //public int FirstSelection { get; set; }
-        //public int SecondSelection { get; set; }
-        //public int ThirdSelection { get; set; }
-
-        //[InverseProperty("FirstStudents")]
-        //public virtual Direction FirstSelection { get; set; }
-        //[InverseProperty("SecondStudents")]
-        //public virtual Direction SecondSelection { get; set; }
-        //[InverseProperty("ThirdStudents")]
-        //public virtual Direction ThirdSelection { get; set; }
+        /// <summary>
+        /// 该学生被录取情况
+        /// </summary>
+        public virtual Enrollment Enrollment { get; set; }        
     }
 }

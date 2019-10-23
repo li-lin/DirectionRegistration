@@ -22,5 +22,6 @@ namespace DirectionRegistration.Repository
         public DbSet<DirectionCourse> DirectionCourses { get; set; }
         public DbSet<Score> Scores { get; set; }
         public DbSet<ServerConfig> ServerConfigurations { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
     }
 }

@@ -215,6 +215,8 @@ namespace DirectionRegistration.Web.Controllers
          */
         private List<GenerationResultModel> Generate()
         {
+            var enrollments = db.Enrollments;
+
             List<GenerationResultModel> result = db.Students.Select(stu => new GenerationResultModel
             {
                 StudentScore = new StudentScoreViewModel
@@ -286,6 +288,7 @@ namespace DirectionRegistration.Web.Controllers
                     return r;
                 });
 
+                int so = 0;//学生在当前方向的考核课程的排名
                 foreach(var tds in thisDirectionStudents.OrderByDescending(ds => ds.StudentScore.Total))
                 {
                     if (tds.StudentScore.Total > 0)
@@ -295,6 +298,15 @@ namespace DirectionRegistration.Web.Controllers
                             tds.DirectionName = direction.DirectionName;
                             tds.DirectionOrder = 1;
                             direction.Count++;
+                            
+                            so++;
+                            enrollments.Add(new Enrollment
+                            {
+                                Direction = db.Directions.SingleOrDefault(d => d.Id == direction.DirectionId),
+                                Student = db.Students.SingleOrDefault(s => s.Id == tds.StudentScore.StudentId),
+                                ScoreOrder = so,
+                                WhichTime = 1
+                            });
                         }
                     }
                 }
@@ -326,8 +338,10 @@ namespace DirectionRegistration.Web.Controllers
                 r.StudentScore.Total = r.StudentScore.Scores.Sum(sc => sc.ScoreValue);
             }
 
+            int bso = 0;//学生专业基础课成绩排名
             foreach (var stu in restStudents.OrderByDescending(r => r.StudentScore.Total))
             {
+                bso++;
                 //按照学生志愿选择顺序依次录取。
                 foreach (var selection in stu.Selections)
                 {
@@ -337,10 +351,19 @@ namespace DirectionRegistration.Web.Controllers
                         stu.DirectionName = dir.DirectionName;
                         stu.DirectionOrder = selection.Order;
                         dir.Count++;
+
+                        enrollments.Add(new Enrollment
+                        {
+                            Direction = db.Directions.SingleOrDefault(d => d.Id == dir.DirectionId),
+                            Student = db.Students.SingleOrDefault(s => s.Id == stu.StudentScore.StudentId),
+                            ScoreOrder = bso,
+                            WhichTime = 2
+                        });
                         break;
                     }
                 }
             }
+            db.SaveChanges();
             return result;
         }
 

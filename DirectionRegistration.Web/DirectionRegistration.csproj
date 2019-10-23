@@ -172,6 +172,7 @@
     <Compile Include="Models\TeacherViewModel.cs" />
     <Compile Include="Repository\Entities\Course.cs" />
     <Compile Include="Repository\Entities\DirectionCourse.cs" />
+    <Compile Include="Repository\Entities\Enrollment.cs" />
     <Compile Include="Repository\Entities\Score.cs" />
     <Compile Include="Repository\Entities\ServerConfig.cs" />
     <Compile Include="Repository\Entities\Teacher.cs" />
