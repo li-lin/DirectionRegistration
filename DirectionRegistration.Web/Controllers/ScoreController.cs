@@ -53,7 +53,7 @@ namespace DirectionRegistration.Web.Controllers
                         }
                         else
                         {
-                            string others = "未找到学生：";
+                            string others = "未找到以下学生信息，无法导入其成绩。\n";
                             foreach(string s in b.Others)
                             {
                                 others += $"[{s}]";
@@ -141,10 +141,14 @@ namespace DirectionRegistration.Web.Controllers
 
                 for (int i = 0; i < directions.Count; i++)
                 {
-                    StringBuilder stringBuilder = new StringBuilder("CREATE TABLE [" + directions[i].Title + "$](学号 Char(100), 姓名 char(100),性别 char(20), 专业 char(160),录取方向 char(160),志愿顺序 char(40),总成绩 char(40)");
-                    foreach (var c in db.Courses)
+                    StringBuilder stringBuilder = new StringBuilder("CREATE TABLE [" + directions[i].Title +
+                        "$](学号 Char(100), 姓名 char(100),性别 char(20), 专业 char(160)," +
+                        "录取方向 char(160),志愿顺序 char(40),录取批次 char(40),成绩排名 char(40),总成绩 char(40)");
+                   
+                    for (int j = 0; j < 3; j++)//3门考核课程的名称和成绩
                     {
-                        stringBuilder.Append($", {c.CourseName} char(160)");
+                        stringBuilder.Append($", 课程{j + 1} char(160)");
+                        stringBuilder.Append($", 成绩{j + 1} char(40)");
                     }
                     stringBuilder.Append(")");
 
@@ -157,18 +161,21 @@ namespace DirectionRegistration.Web.Controllers
                 }
 
                 //利用模型生成录取数据
-                List<GenerationResultModel> result = Generate();
+                //List<GenerationResultModel> result = Generate();
+                List<EnrollmentViewModel> enrollments = GetEnrollmentViewModels();
 
-                foreach (var r in result)
+                foreach (var r in enrollments)
                 {
                     if (r.DirectionName == null) continue;
-                    StringBuilder sb1 = new StringBuilder("INSERT INTO[" + r.DirectionName + "$](学号, 姓名, 性别, 专业, 录取方向, 志愿顺序, 总成绩");
-                    StringBuilder sb2 = new StringBuilder(" VALUES(@number,@name,@gender,@major,@direction,@order,@total");
-                    var courses = db.Courses.ToList();
-                    for (int i = 0; i < courses.Count; i++)
+                    StringBuilder sb1 = new StringBuilder("INSERT INTO[" + r.DirectionName + 
+                        "$](学号, 姓名, 性别, 专业, 录取方向, 志愿顺序, 录取批次, 成绩排名, 总成绩");
+                    StringBuilder sb2 = new StringBuilder(" VALUES(@number,@name,@gender,@major,@direction,@order,@time,@scoreOrder,@total");
+
+                    var scores = r.Scores;
+                    for (int i = 0; i < scores.Count; i++)
                     {
 
-                        sb1.Append($", {courses[i].CourseName}");
+                        sb1.Append($", {scores[i].ScoreName}");
                         sb2.Append($", @score{i + 1}");
                     }
                     sb1.Append(")");
@@ -179,25 +186,20 @@ namespace DirectionRegistration.Web.Controllers
                     {
                         cmdInsert.Connection = connection;
                         cmdInsert.CommandText = insertCommand;
-                        cmdInsert.Parameters.Add(new OleDbParameter("@number", r.StudentScore.StudentNumber));
-                        cmdInsert.Parameters.Add(new OleDbParameter("@name", r.StudentScore.StudentName));
-                        cmdInsert.Parameters.Add(new OleDbParameter("@gender", r.StudentScore.StudentGender));
-                        cmdInsert.Parameters.Add(new OleDbParameter("@major", r.StudentScore.StudentMajor));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@number", r.StudentInfo.Number));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@name", r.StudentInfo.Name));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@gender", r.StudentInfo.Gender));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@major", r.StudentInfo.Major));
                         cmdInsert.Parameters.Add(new OleDbParameter("@direction", r.DirectionName));
-                        cmdInsert.Parameters.Add(new OleDbParameter("@order", r.DirectionOrder)); ;
-                        cmdInsert.Parameters.Add(new OleDbParameter("@total", r.StudentScore.Total));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@order", r.DirectionOrder));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@time", r.EnrollTime));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@scoreOrder", r.ScoreOrder));
+                        cmdInsert.Parameters.Add(new OleDbParameter("@total", r.ScoreTotal));
 
-                        for (int i = 0; i < courses.Count; i++)
+                        for (int i = 0; i < scores.Count; i++)
                         {
-                            var score = r.StudentScore.Scores.SingleOrDefault(sc => sc.ScoreName == courses[i].CourseName);
-                            if (score != null && score.ScoreName != null)
-                            {
-                                cmdInsert.Parameters.Add(new OleDbParameter($"@score{i + 1}", score.ScoreValue));
-                            }
-                            else
-                            {
-                                cmdInsert.Parameters.Add(new OleDbParameter($"@score{i + 1}", 0));
-                            }
+                            var scoreValue = scores[i].ScoreValue;
+                            cmdInsert.Parameters.Add(new OleDbParameter($"@score{i + 1}", scoreValue));
                         }
                         cmdInsert.ExecuteNonQuery();
                     }
@@ -363,8 +365,47 @@ namespace DirectionRegistration.Web.Controllers
                     }
                 }
             }
-            db.SaveChanges();
+            int ok = db.SaveChanges();
+            if (ok > 0)
+            {
+                db.ServerConfigurations.FirstOrDefault().EnrollmentState = 1;//设置录取工作状态为1，表示已完成。
+            }
             return result;
+        }
+
+        /// <summary>
+        /// 获取录取信息列表
+        /// </summary>
+        /// <returns></returns>
+        private List<EnrollmentViewModel> GetEnrollmentViewModels()
+        {
+            List<EnrollmentViewModel> enrollments = db.Enrollments.Select(en => new EnrollmentViewModel
+            {
+                EnrollmentId = en.EnrollmentId,
+                StudentInfo = new StudentInfoViewModel
+                {
+                    Id = en.Student.Id,
+                    Name = en.Student.Name,
+                    Gender = en.Student.Gender,
+                    Major = en.Student.Major,
+                    Number = en.Student.Number
+                },
+                DirectionName = en.Direction.Title,
+                DirectionOrder = en.Direction.DirectionStudents.SingleOrDefault(ds => ds.Student.Id == en.Student.Id).Order,
+                EnrollTime = en.WhichTime,
+                ScoreOrder = en.ScoreOrder,
+                Scores = en.EnrollCourses.Select(ec => new ScoreInfoViewModel
+                {
+                    ScoreName = ec.CourseName,
+                    ScoreValue = ec.Scores.SingleOrDefault(s => s.Student.Id == en.Student.Id).Value ?? 0.0
+                }).ToList()
+            }).ToList();
+
+            foreach (var enroll in enrollments)
+            {
+                enroll.ScoreTotal = enroll.Scores.Sum(s => s.ScoreValue);
+            }
+            return enrollments;
         }
 
 

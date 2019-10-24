@@ -13,5 +13,10 @@ namespace DirectionRegistration.Repository.Entities
     {
         public int Id { get; set; }
         public DateTime Deadline { get; set; }
+        /// <summary>
+        /// 录取工作状态，0为未进行，1为已完成。
+        /// </summary>
+        public int EnrollmentState { get; set; }
+
     }
 }

@@ -28,6 +28,6 @@ namespace DirectionRegistration.Repository.Entities
         /// <summary>
         /// 该学生被录取情况
         /// </summary>
-        public virtual Enrollment Enrollment { get; set; }        
+        public virtual Enrollment Enrollment { get; set; }
     }
 }

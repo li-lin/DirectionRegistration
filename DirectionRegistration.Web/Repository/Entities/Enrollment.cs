@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DirectionRegistration.Repository.Entities
 {
@@ -10,6 +12,8 @@ namespace DirectionRegistration.Repository.Entities
     /// </summary>
     public class Enrollment
     {
+        [Key]
+        [ForeignKey("Student")]
         public int EnrollmentId { get; set; }
         public virtual Direction Direction { get; set; }
         public virtual Student Student { get; set; }
@@ -21,5 +25,7 @@ namespace DirectionRegistration.Repository.Entities
         /// 学生是第几批次被录取
         /// </summary>
         public int WhichTime { get; set; }
+
+        public virtual List<Course> EnrollCourses { get; set; }
     }
 }

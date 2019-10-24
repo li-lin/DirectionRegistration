@@ -59,7 +59,7 @@ namespace DirectionRegistration.Repository
                     Number="2016004",
                     Name="王小八",
                     Gender="男",
-                     Major="网络工程",
+                     Major="信息管理",
                      Password="123456"
                 }
             };
@@ -70,7 +70,8 @@ namespace DirectionRegistration.Repository
 
             var config = new ServerConfig()
             {
-                Deadline = new DateTime(2018, 7, 30)
+                Deadline = new DateTime(2018, 7, 30),
+                EnrollmentState = 0
             };
             context.ServerConfigurations.Add(config);
 
@@ -98,7 +99,8 @@ namespace DirectionRegistration.Repository
 
                 var config = new ServerConfig()
                 {
-                    Deadline = DateTime.Now.AddDays(30)
+                    Deadline = DateTime.Now.AddDays(30),
+                    EnrollmentState = 0
                 };
                 context.ServerConfigurations.Add(config);
 

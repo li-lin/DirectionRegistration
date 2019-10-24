@@ -18,7 +18,7 @@ namespace DirectionRegistration.Web.Controllers
     [CustHandleError]
     public class AdminController : Controller
     {
-        private RegistrationDbContext db = new RegistrationDbContext();
+        private readonly RegistrationDbContext db = new RegistrationDbContext();
 
         [LoginCheck]
         public ActionResult Index(int? page)
