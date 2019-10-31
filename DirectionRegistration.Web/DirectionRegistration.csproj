@@ -266,6 +266,7 @@
     <Content Include="Content\UploadFiles\template.xls" />
     <Content Include="Content\UploadFiles\template-score.xls" />
     <Content Include="Content\DownloadFiles\tempGeneration.xls" />
+    <Content Include="Content\DownloadFiles\tempGeneration1.xls" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Properties\PublishProfiles\SelectDirections2018.pubxml" />
     <None Include="Scripts\jquery-1.12.4.intellisense.js" />
@@ -321,7 +322,7 @@
     <Content Include="Views\Student\Index.cshtml" />
     <Content Include="Views\Student\PartialModifyStudent.cshtml" />
     <Content Include="Views\Student\PartialStudentList.cshtml" />
-    <Content Include="Views\Score\PartialUploadScore.cshtml" />
+    <Content Include="Views\Course\PartialUploadScore.cshtml" />
     <Content Include="Views\Score\Index.cshtml" />
     <Content Include="Views\Student\PartialStudentScore.cshtml" />
     <Content Include="Views\Direction\PartialDirectionCourseList.cshtml" />

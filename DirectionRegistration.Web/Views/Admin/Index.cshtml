@@ -4,65 +4,83 @@
 @{
     ViewBag.Title = "管理面板";
 }
-
 <div class="page-header">
-    <h3>管理面板 - [@ViewBag.TeacherInfo]<span class="label label-primary pull-right">已填报[<span style="color:brown">@ViewBag.DirName</span>]方向 @ViewBag.Now 人，共 @ViewBag.All 人</span></h3>
+    <h3>@ViewBag.Title</h3>
 </div>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>学号</th>
-            <th>姓名</th>
-            <th>性别</th>
-            <th>专业</th>
-            <th>第1志愿</th>
-            <th>第2志愿</th>
-            <th>第3志愿</th>
-            <th>第4志愿</th>
-            <th>第5志愿</th>
-            <th>操作</th>
-        </tr>
-    </thead>
-    <tbody id="tableBody">
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @item.Number
-                </td>
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @item.Gender
-                </td>
-                <td>
-                    @item.Major
-                </td>
-                @foreach (var dir in item.Selections)
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">管理员 - [@ViewBag.TeacherInfo]
+            <span class="label label-primary pull-right" style="font-size:1.1em;">
+                已填报[<span style="color:brown">@ViewBag.DirName</span>] @ViewBag.Now / @ViewBag.All 
+            </span>
+        </h3>
+    </div>
+    <div class="panel-body">
+        @Html.ActionLink("方向录取", "GenerateResult","Score", null, new { id = "btn-export-result", @class = "btn btn-success", title = "使用成绩优先算法，成绩高者先录取。" })
+        @Ajax.ActionLink("方向录取Ajax", "GenerateResult", "Score", null, new AjaxOptions { LoadingElementId = "loading", OnSuccess="exported_excel" }, new { id = "btn-export-result", @class = "btn btn-success", title = "使用成绩优先算法，成绩高者先录取。" })
+        <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">志愿信息</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped"> 
+            <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>专业</th>
+                    <th>第1志愿</th>
+                    <th>第2志愿</th>
+                    <th>第3志愿</th>
+                    <th>第4志愿</th>
+                    <th>第5志愿</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                @foreach (var item in Model)
                 {
-                    <td>
-                        @dir.DirectionName
-                    </td>
+                    <tr>
+                        <td>
+                            @item.Number
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @item.Gender
+                        </td>
+                        <td>
+                            @item.Major
+                        </td>
+                        @foreach (var dir in item.Selections)
+                        {
+                            <td>
+                                @dir.DirectionName
+                            </td>
+                        }
+                        <td>
+                            <button onclick="showDetail('@item.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">详情</button>
+                        </td>
+                    </tr>
                 }
-                <td>
-                    <button onclick="showDetail('@item.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">详情</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-<div>
-    第@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)页-共 @Model.PageCount 页
-    @Html.PagedListPager(Model,
-    page => Url.Action("Index", "Admin",
-        new
-        {
-            page = page
-        }))
+            </tbody>
+        </table>
+        <div>
+            第@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)页-共 @Model.PageCount 页
+            @Html.PagedListPager(Model,
+            page => Url.Action("Index", "Admin",
+                new
+                {
+                    page = page
+                }))
+        </div>
+    </div>
 </div>
-
 
 @section scripts{
     <script>
@@ -73,5 +91,15 @@
             });
         }
 
+
+        function exported_excel(data) {
+            var hidden_link = document.createElement('a');
+            hidden_link.style.display = "none";
+            hidden_link.href = data;
+            document.body.appendChild(hidden_link);
+            hidden_link.onclick = function () { };
+            hidden_link.click();
+            document.body.removeChild(hidden_link);
+        }
     </script>
 }

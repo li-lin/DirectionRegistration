@@ -23,113 +23,13 @@ namespace DirectionRegistration.Web.Controllers
             return View();
         }
 
-
-        public ActionResult UploadScore()
-        {
-            return PartialView("PartialUploadScore");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult UploadScore(IEnumerable<HttpPostedFileBase> files)
-        {
-            if (files != null)
-            {
-                foreach (var file in files)
-                {
-                    string fileExtentian = file.FileName.Substring(file.FileName.LastIndexOf(".")).ToLower();
-                    if (fileExtentian == ".xls" || fileExtentian == ".xlsx")
-                    {
-                        string newFileName = DateTime.Now.ToString("yyyyMMddhhmmss") + fileExtentian;
-                        string path = Server.MapPath("~/Content/UploadFiles/Score_" + newFileName);
-                        file.SaveAs(path);
-
-                        RemoveAllScore();
-
-                        ImportReturnModel b = ImportStudentsFromExcel(path);
-                        if (b.Code == 1)
-                        {
-                            return Json(new { code = "101", msg = "成绩数据导入成功。" });
-                        }
-                        else
-                        {
-                            string others = "未找到以下学生信息，无法导入其成绩。\n";
-                            foreach(string s in b.Others)
-                            {
-                                others += $"[{s}]";
-                            }
-                            return Json(new { code = "102", msg = "导入遇到一些问题。", data = others });
-                        }
-                    }
-                }
-            }
-            return Json(new { code = "100", msg = "学生数据上传或导入失败。" });
-        }
-
-        private void RemoveAllScore()
-        {
-            db.Scores.RemoveRange(db.Scores);
-            db.SaveChanges();
-        }
-
-        private ImportReturnModel ImportStudentsFromExcel(string path)
-        {
-            //int result = 0;//0：失败
-            var result = new ImportReturnModel
-            {
-                Code = 0,
-                Others = new List<string>()
-            };
-            string connectionString = "Provider=Microsoft.Jet.OleDb.4.0; Data Source=" + path + "; Extended Properties=Excel 8.0;";
-            using (OleDbConnection Connection = new OleDbConnection(connectionString))
-            {
-                DataTable dt = new DataTable();
-                Connection.Open();
-                using (OleDbCommand command = new OleDbCommand())
-                {
-                    command.Connection = Connection;
-                    command.CommandText = "SELECT * FROM [成绩表$]";
-                    OleDbDataAdapter adapter = new OleDbDataAdapter(command);
-                    adapter.Fill(dt);
-                    foreach (DataRow dr in dt.Rows)
-                    {
-                        string number = dr["学号"].ToString();
-                        string studentName = dr["姓名"].ToString();
-                        string courseName = dr["课程"].ToString();
-                        float.TryParse(dr["成绩"].ToString(), out float scoreValue);
-
-
-                        //判断导入的学生成绩是否有对应学生信息。
-                        var student = db.Students.SingleOrDefault(stu => stu.Number == number);
-                        if (student == null)
-                        {
-                            result.Others.Add(number); //如果没有，则收集学生学号。
-                            continue;
-                        }
-
-                        Score s = new Score
-                        {
-                            Student = student,
-                            Course = db.Courses.SingleOrDefault(c => c.CourseName == courseName),
-                            Value = scoreValue
-                        };
-                        db.Scores.Add(s);
-                    }
-                    adapter.Dispose();
-                    int i = this.db.SaveChanges();
-                    if (i > 0) result.Code = 1; //1：成功
-                }
-            }
-            return result;
-        }
-
         /// <summary>
         /// 生成录取结果的Excel文件
         /// </summary>
         /// <returns></returns>
         public ActionResult GenerateResult()
-        {
-            string tempPath = Server.MapPath("~/Content/DownloadFiles/tempGeneration.xls");
+        {            
+            string tempPath = Server.MapPath("~/Content/DownloadFiles/tempGeneration1.xls");
             string path = Server.MapPath("~/Content/DownloadFiles/" + (DateTime.Now.Year - 2) + "级方向录取结果-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".xls");
             System.IO.File.Copy(tempPath, path);
 
@@ -144,12 +44,14 @@ namespace DirectionRegistration.Web.Controllers
                     StringBuilder stringBuilder = new StringBuilder("CREATE TABLE [" + directions[i].Title +
                         "$](学号 Char(100), 姓名 char(100),性别 char(20), 专业 char(160)," +
                         "录取方向 char(160),志愿顺序 char(40),录取批次 char(40),成绩排名 char(40),总成绩 char(40)");
-                   
-                    for (int j = 0; j < 3; j++)//3门考核课程的名称和成绩
+                    
+                    int c_count = directions[i].DirectionCourses.Count;
+                    for (int j = 0; j < c_count + 1; j++)//3门考核课程以及加分项的名称和成绩
                     {
                         stringBuilder.Append($", 课程{j + 1} char(160)");
                         stringBuilder.Append($", 成绩{j + 1} char(40)");
                     }
+
                     stringBuilder.Append(")");
 
                     using (OleDbCommand command = new OleDbCommand())
@@ -171,8 +73,10 @@ namespace DirectionRegistration.Web.Controllers
                         "$](学号, 姓名, 性别, 专业, 录取方向, 志愿顺序, 录取批次, 成绩排名, 总成绩");
                     StringBuilder sb2 = new StringBuilder(" VALUES(@number,@name,@gender,@major,@direction,@order,@time,@scoreOrder,@total");
 
+                    var theDirection = directions.SingleOrDefault(d => d.Title == r.DirectionName);
+                    int c_count = theDirection.DirectionCourses.Count;
                     var scores = r.Scores;
-                    for (int i = 0; i < scores.Count; i++)
+                    for (int i = 0; i < c_count + 1; i++)
                     {
 
                         sb1.Append($", {scores[i].ScoreName}");
@@ -196,7 +100,7 @@ namespace DirectionRegistration.Web.Controllers
                         cmdInsert.Parameters.Add(new OleDbParameter("@scoreOrder", r.ScoreOrder));
                         cmdInsert.Parameters.Add(new OleDbParameter("@total", r.ScoreTotal));
 
-                        for (int i = 0; i < scores.Count; i++)
+                        for (int i = 0; i < scores.Count + 1; i++)
                         {
                             var scoreValue = scores[i].ScoreValue;
                             cmdInsert.Parameters.Add(new OleDbParameter($"@score{i + 1}", scoreValue));
@@ -206,7 +110,8 @@ namespace DirectionRegistration.Web.Controllers
                 }
                 connection.Close();
             }
-            return File(path, "application/vnd.ms-excel", path.Substring(path.LastIndexOf("\\")));
+            //return File(path, "application/vnd.ms-excel", System.IO.Path.GetFileName(path));
+            return Content($"/Content/DownloadFiles/{System.IO.Path.GetFileName(path)}");
         }       
 
         /**
@@ -217,7 +122,7 @@ namespace DirectionRegistration.Web.Controllers
          */
         private List<GenerationResultModel> Generate()
         {
-            var enrollments = db.Enrollments;
+            //var enrollments = db.Enrollments;
 
             List<GenerationResultModel> result = db.Students.Select(stu => new GenerationResultModel
             {
@@ -228,7 +133,7 @@ namespace DirectionRegistration.Web.Controllers
                     StudentName = stu.Name,
                     StudentGender = stu.Gender,
                     StudentMajor = stu.Major,
-                    Scores = stu.Scores.Select(sc => new ScoreInfoViewModel
+                    Scores = stu.Scores.Select(sc => new ScoreInfoViewModel //该学生所有成绩
                     {
                         ScoreName = sc.Course.CourseName,
                         ScoreValue = sc.Value ?? 0
@@ -251,7 +156,7 @@ namespace DirectionRegistration.Web.Controllers
                 DirectionId = d.Id,
                 DirectionName = d.Title,
                 Max = d.Max,
-                Count = 0,
+                Count = d.Enrollments.Count, //本轮录取的初始数量为提前直接录取后的人数。
                 Courses = d.DirectionCourses.Select(dc => new DirectionCourseInfoModel
                 {
                     CourseId = dc.Course.Id,
@@ -259,10 +164,11 @@ namespace DirectionRegistration.Web.Controllers
                     Proportion = dc.Proportion
                 }).ToList()
             }).ToList();
+
             //按方向依次进行录取
             foreach(var direction in directions)
             {
-                //找出所有选择该方向为第一志愿的学生信息。
+                //找出所有选择该方向为第一志愿的学生信息，并计算其考核课程以及加分项的总成绩。
                 var thisDirectionStudents = result.Where(s => {
                     bool r = false;
                     if (s.Selections.Count != 0)
@@ -273,15 +179,39 @@ namespace DirectionRegistration.Web.Controllers
                             r = dir.Id == direction.DirectionId;
                             if (r)
                             {
-                                //如果为第一志愿则计算出考核课程的加权总分。
-                                double total = 0.0;
-                                foreach(var dc in direction.Courses)
+                                //筛选出该学生第一志愿方向对应课程及成绩。
+                                List<ScoreInfoViewModel> thisStuDirectionScores = new List<ScoreInfoViewModel>();
+                                foreach (var dc in direction.Courses)
                                 {
-                                    var score = s.StudentScore.Scores.SingleOrDefault(sc => sc.ScoreName == dc.CourseName);
+                                    var scores = s.StudentScore.Scores;
+                                    var score = scores.SingleOrDefault(sc => sc.ScoreName == dc.CourseName);
                                     if (score != null)
                                     {
-                                        total += score.ScoreValue * dc.Proportion;
+                                        thisStuDirectionScores.Add(score);
                                     }
+                                }
+
+                                //如果为第一志愿则计算出考核课程的加权总分。
+                                double total = 0.0;
+
+                                //针对当前方向有超过3门指定考核课程的，仅取成绩较高的4门课的成绩。
+                                if (thisStuDirectionScores.Count > 3)
+                                {
+                                    thisStuDirectionScores = thisStuDirectionScores.OrderByDescending(sds => sds.ScoreValue).Take(4).ToList();
+                                }
+                                //计算方向考核课程总成绩，并记录参与该方向考核的学生课程名称。
+                                foreach(var item in thisStuDirectionScores)
+                                {
+                                    total += item.ScoreValue;
+                                    s.EnrollmentCourses.Add(item.ScoreName);
+                                }
+
+                                //有加分的学生成绩，记入总分。
+                                var addtinalScore = s.StudentScore.Scores.SingleOrDefault(ss => ss.ScoreName == "加分项");
+                                if (addtinalScore != null)
+                                {
+                                    total += addtinalScore.ScoreValue;
+                                    s.EnrollmentCourses.Add(addtinalScore.ScoreName);
                                 }
                                 s.StudentScore.Total = total;
                             }
@@ -290,25 +220,52 @@ namespace DirectionRegistration.Web.Controllers
                     return r;
                 });
 
+                /***第一轮录取逻辑***/
                 int so = 0;//学生在当前方向的考核课程的排名
-                foreach(var tds in thisDirectionStudents.OrderByDescending(ds => ds.StudentScore.Total))
+                double theLastOne = 0; //当前方向录取到限定人数时的最小总成绩。
+                foreach (var tds in thisDirectionStudents.OrderByDescending(ds => ds.StudentScore.Total))
                 {
-                    if (tds.StudentScore.Total > 0)
+                    double thisTotal = tds.StudentScore.Total;
+                    bool canEnroll = false;
+                    if (thisTotal > 0)
                     {
                         if (direction.Count < direction.Max)
+                        {
+                            theLastOne = thisTotal;
+                            canEnroll = true;
+
+                        }
+                        else if (thisTotal == theLastOne) //当达到方向上线人数时，如果存在与最后一个成绩相同的学生，一并录取。
+                        {
+                            canEnroll = true;
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                        if (canEnroll)
                         {
                             tds.DirectionName = direction.DirectionName;
                             tds.DirectionOrder = 1;
                             direction.Count++;
-                            
                             so++;
-                            enrollments.Add(new Enrollment
+
+                            //将录取信息记入数据库
+                            var enrollment = new Enrollment
                             {
                                 Direction = db.Directions.SingleOrDefault(d => d.Id == direction.DirectionId),
                                 Student = db.Students.SingleOrDefault(s => s.Id == tds.StudentScore.StudentId),
                                 ScoreOrder = so,
-                                WhichTime = 1
-                            });
+                                WhichTime = 1,
+                                EnrollCourses = new List<Course>()
+                            };
+                            foreach(var cname in tds.EnrollmentCourses)
+                            {
+                                var course = db.Courses.SingleOrDefault(c => c.CourseName == cname);
+                                enrollment.EnrollCourses.Add(course);
+                            }
+                            db.Enrollments.Add(enrollment);
                         }
                     }
                 }
@@ -318,26 +275,24 @@ namespace DirectionRegistration.Web.Controllers
             //获取还未被录取的学生
             var restStudents = result.Where(r => String.IsNullOrEmpty(r.DirectionName));
             //获取专业基础课信息
-            var basicCourese = db.Courses.Where(c => c.DirectionCourse.Count() == 0);
+            var basicCoureses = db.Courses.Where(c => c.DirectionCourse.Count() == 0);
 
-            int courseCount = basicCourese.Count();
             foreach (var r in restStudents)
             {
-                if (r.StudentScore.Scores.Count < courseCount)
+                List<ScoreInfoViewModel> thisStuBasicScores = new List<ScoreInfoViewModel>();
+                foreach (var course in basicCoureses.ToArray())
                 {
-                    foreach (var course in basicCourese.ToArray())
+                    var score = r.StudentScore.Scores.SingleOrDefault(sc => sc.ScoreName == course.CourseName);
+                    if (score != null)
                     {
-                        if (r.StudentScore.Scores.SingleOrDefault(sc => sc.ScoreName == course.CourseName) == null)
-                        {
-                            r.StudentScore.Scores.Add(new ScoreInfoViewModel
-                            {
-                                ScoreName = course.CourseName,
-                                ScoreValue = 0
-                            });
-                        }
+                        thisStuBasicScores.Add(score);
                     }
                 }
-                r.StudentScore.Total = r.StudentScore.Scores.Sum(sc => sc.ScoreValue);
+                foreach(var item in thisStuBasicScores) //*包括了具有加分的学生成绩
+                {
+                    r.StudentScore.Total += item.ScoreValue;
+                    r.EnrollmentCourses.Add(item.ScoreName);
+                }
             }
 
             int bso = 0;//学生专业基础课成绩排名
@@ -353,23 +308,31 @@ namespace DirectionRegistration.Web.Controllers
                         stu.DirectionName = dir.DirectionName;
                         stu.DirectionOrder = selection.Order;
                         dir.Count++;
-
-                        enrollments.Add(new Enrollment
+                        
+                        //将录取信息记入数据库
+                        var enrollment = new Enrollment
                         {
                             Direction = db.Directions.SingleOrDefault(d => d.Id == dir.DirectionId),
                             Student = db.Students.SingleOrDefault(s => s.Id == stu.StudentScore.StudentId),
                             ScoreOrder = bso,
-                            WhichTime = 2
-                        });
+                            WhichTime = 2,
+                            EnrollCourses = new List<Course>()
+                        };
+                        foreach(var cname in stu.EnrollmentCourses)
+                        {
+                            var course = db.Courses.SingleOrDefault(c => c.CourseName == cname);
+                            if (course != null)
+                            {
+                                enrollment.EnrollCourses.Add(course);
+                            }
+                        }
+
+                        db.Enrollments.Add(enrollment);
                         break;
                     }
                 }
             }
-            int ok = db.SaveChanges();
-            if (ok > 0)
-            {
-                db.ServerConfigurations.FirstOrDefault().EnrollmentState = 1;//设置录取工作状态为1，表示已完成。
-            }
+            int ok = db.SaveChanges();           
             return result;
         }
 
@@ -409,11 +372,7 @@ namespace DirectionRegistration.Web.Controllers
         }
 
 
-        class ImportReturnModel
-        {
-            public int Code { get; set; }
-            public List<string> Others { get; set; }
-        }
+        
 
         class RegDirectionInfoModel
         {

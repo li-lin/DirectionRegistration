@@ -1,5 +1,5 @@
 ﻿<div class="container-fluid">
-    @using (Html.BeginForm("UploadScore", "Score", FormMethod.Post, new { id = "formUpload", enctype = "multipart/form-data" }))
+    @using (Html.BeginForm("UploadScore", "Course", FormMethod.Post, new { id = "formUpload", enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
         <div class="form-group">
@@ -24,7 +24,7 @@
             var loading = $('#loading');
             if ($('#uploadInput').val().length>0) {
                 $("form#formUpload").ajaxSubmit({
-                    url: '@Url.Action("UploadScore", "Score")',
+                    url: '@Url.Action("UploadScore", "Course")',
                     type: "post",
                     beforeSubmit: function () {
                         loading.show();
@@ -33,7 +33,7 @@
                         loading.hide();
                         if (data.code == "101") {
                             toastr.success(data.msg);
-                            window.location.href = "@Url.Action("Index", "Score", new { ssid = Guid.NewGuid().ToString() })";
+                            window.location.href = "@Url.Action("Index", "Course", new { ssid = Guid.NewGuid().ToString() })";
                         } else if (data.code == "102") {
                             toastr.warning(data.msg);
                             console.log(data.data);

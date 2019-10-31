@@ -92,7 +92,7 @@ namespace DirectionRegistration.Web.Controllers
             }
             return PartialView("PartialStudentList", data); 
         }
-
+       
         public ActionResult GetStudents(PagedStudentsViewModel model)
         {
             List<StudentInfoViewModel> data = null;
@@ -221,16 +221,17 @@ namespace DirectionRegistration.Web.Controllers
                         {
                             return Json(new { code = "101", msg = "学生数据导入成功。" });
                         }
-                        //else if (b == 2)
-                        //{
-                        //    return Json(new { code = "102", msg = "学生数据重复，请确认后再导入。" });
-                        //}
                     }
                 }
             }
             return Json(new { code = "100", msg = "学生数据上传或导入失败。" });
         }
 
+        /// <summary>
+        /// 从上传的Excel中导入学生信息
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private int ImportStudentsFromExcel(string path)
         {
             int result = 0;//0：失败

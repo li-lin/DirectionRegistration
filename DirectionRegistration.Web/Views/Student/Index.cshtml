@@ -12,42 +12,42 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">添加学生</h3>
+        <h3 class="panel-title">添加与搜索</h3>
     </div>
     <div class="panel-body">
         @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAddSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
         {
-        <div class="row">
-            <div class="form-group col-sm-2">
-                <label class="sr-only" for="courseName">学号</label>
-                @Html.TextBoxFor(model => model.Number, new { @class = "form-control", placeholder = "学号" })
+            <div class="row">
+                <div class="form-group col-sm-2">
+                    <label class="sr-only" for="courseName">学号</label>
+                    @Html.TextBoxFor(model => model.Number, new { @class = "form-control", placeholder = "学号" })
+                </div>
+                <div class="form-group col-sm-2">
+                    <label class="sr-only" for="courseName">姓名</label>
+                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "姓名" })
+                </div>
+                <div class="form-group col-sm-1">
+                    <label class="sr-only" for="courseName">性别</label>
+                    @Html.DropDownList("Gender", new List<SelectListItem>() {
+                   new SelectListItem {
+                       Text ="男",
+                       Selected =false,
+                       Value ="男"},
+                   new SelectListItem { Text = "女",
+                       Selected = true,
+                       Value = "女" } }, new { @class = "form-control" })
+                </div>
+                <div class="form-group col-sm-3">
+                    <label class="sr-only" for="courseName">专业</label>
+                    @Html.DropDownListFor(model => model.Major, ViewBag.Majors as List<SelectListItem>, new { @class = "form-control" })
+                </div>
+                <div class="form-group col-sm-4">
+                    <button type="submit" class="btn btn-success">添加</button>
+                    @Html.ActionLink("导入学生", "UploadData", null, new { id = "btn-import", @class = "btn btn-default", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
+                    <a href="#" class="btn btn-default" id="btn-search" title="按学号">搜索</a>
+                    <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+                </div>
             </div>
-            <div class="form-group col-sm-2">
-                <label class="sr-only" for="courseName">姓名</label>
-                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "姓名" })
-            </div>
-            <div class="form-group col-sm-2">
-                <label class="sr-only" for="courseName">性别</label>
-                @Html.DropDownList("Gender", new List<SelectListItem>() {
-               new SelectListItem {
-                   Text ="男",
-                   Selected =false,
-                   Value ="男"},
-               new SelectListItem { Text = "女",
-                   Selected = true,
-                   Value = "女" } }, new { @class = "form-control" })
-            </div>
-            <div class="form-group col-sm-3">
-                <label class="sr-only" for="courseName">专业</label>
-                @Html.DropDownListFor(model => model.Major, ViewBag.Majors as List<SelectListItem>, new { @class = "form-control" })
-            </div>
-            <div class="form-group col-sm-3">
-                <button type="submit" class="btn btn-success">添加</button>
-                @Html.ActionLink("导入", "UploadData", null, new { id = "btn-import", @class = "btn btn-success", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
-                <a href="#" class="btn btn-default" id="btn-search" >搜索</a>               
-                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
-            </div>
-        </div>
         }
     </div>
 </div>
@@ -70,9 +70,9 @@
                 @Html.Action("GetStudents", "Student")
             </tbody>
         </table>
-        <div>           
+        <div>
             <nav aria-label="Page navigation">
-                <ul id="pager" class="pagination">                   
+                <ul id="pager" class="pagination">
                     @for (int i = 0; i < (int)ViewBag.PageCount; i++)
                     {
                         if (i == (int)ViewBag.PageNumber - 1)
@@ -134,7 +134,7 @@
                 });
         }
 
-        
+
         function showScore(id) {
             handleModal({
                 title: '成绩详情',
@@ -150,7 +150,7 @@
                 submit: '保存'
             });
         }
-        
+
         function onAddSuccess(d) {
             if (d.code == 1) {
                 toastr.warning(d.data);
@@ -185,5 +185,4 @@
             }
         }
     </script>
-
 }
