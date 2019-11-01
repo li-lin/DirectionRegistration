@@ -15,33 +15,40 @@
         <h3 class="panel-title">添加与搜索</h3>
     </div>
     <div class="panel-body">
-        @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onAddSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
+        @using (Ajax.BeginForm("Add", null, new AjaxOptions { HttpMethod = "POST", OnBegin = "onAddBegin", OnSuccess = "onAddSuccess", LoadingElementId = "loading" }, new { @class = "form-inline" }))
         {
             <div class="row">
                 <div class="form-group col-sm-2">
                     <label class="sr-only" for="courseName">学号</label>
-                    @Html.TextBoxFor(model => model.Number, new { @class = "form-control", placeholder = "学号" })
+                    @Html.TextBoxFor(model => model.Number, new { id = "number", @class = "form-control", placeholder = "学号" })
                 </div>
                 <div class="form-group col-sm-2">
                     <label class="sr-only" for="courseName">姓名</label>
-                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "姓名" })
+                    @Html.TextBoxFor(model => model.Name, new { id = "name", @class = "form-control", placeholder = "姓名" })
                 </div>
-                <div class="form-group col-sm-1">
+                <div class="form-group col-sm-2">
                     <label class="sr-only" for="courseName">性别</label>
                     @Html.DropDownList("Gender", new List<SelectListItem>() {
+                   new SelectListItem
+                   {
+                       Selected=true,
+                       Text="未选择",
+                       Value=""
+                   },
                    new SelectListItem {
                        Text ="男",
                        Selected =false,
                        Value ="男"},
-                   new SelectListItem { Text = "女",
-                       Selected = true,
-                       Value = "女" } }, new { @class = "form-control" })
+                   new SelectListItem { 
+                       Text = "女",
+                       Selected = false,
+                       Value = "女" } }, new { id = "gender", @class = "form-control" })
                 </div>
                 <div class="form-group col-sm-3">
                     <label class="sr-only" for="courseName">专业</label>
-                    @Html.DropDownListFor(model => model.Major, ViewBag.Majors as List<SelectListItem>, new { @class = "form-control" })
+                    @Html.DropDownListFor(model => model.Major, ViewBag.Majors as List<SelectListItem>, new { id = "major", @class = "form-control" })
                 </div>
-                <div class="form-group col-sm-4">
+                <div class="form-group col-sm-3">
                     <button type="submit" class="btn btn-success">添加</button>
                     @Html.ActionLink("导入学生", "UploadData", null, new { id = "btn-import", @class = "btn btn-default", data_remote = "false", data_toggle = "modal", data_target = "#myModal" })
                     <a href="#" class="btn btn-default" id="btn-search" title="按学号">搜索</a>
@@ -70,23 +77,6 @@
                 @Html.Action("GetStudents", "Student")
             </tbody>
         </table>
-        <div>
-            <nav aria-label="Page navigation">
-                <ul id="pager" class="pagination">
-                    @for (int i = 0; i < (int)ViewBag.PageCount; i++)
-                    {
-                        if (i == (int)ViewBag.PageNumber - 1)
-                        {
-                            <li class="active" data-page="@i"><a href="#">@(i + 1)</a></li>
-                        }
-                        else
-                        {
-                            <li data-page="@i"><a href="#">@(i + 1)</a></li>
-                        }
-                    }
-                </ul>
-            </nav>
-        </div>
     </div>
 </div>
 
@@ -94,6 +84,25 @@
     <script src="~/Scripts/jquery.form.js"></script>
     <script>
         $(document).ready(function () {
+
+            bindPagerItems();
+
+            $("#btn-search").click(function () {
+                var major = $("#major").val();
+                var gender = $("#gender").val();
+                var name = $("#name").val();
+                var number = $("#number").val();
+                var url = '@Url.Action("GetStudents", "Student")';
+                var param = {
+                    major: major,
+                    gender: gender,
+                    number: number,
+                    name: name
+                };
+                toPage(url, param);
+                return false;
+            });
+
             $('#btn-import').click(function () {
                 handleModal({
                     title: '导入学生数据',
@@ -101,39 +110,21 @@
                     submit: '导入'
                 });
             });
-
-            handlePage();//加载分页信息
-
-            $('#btn-search').click(function () {
-                var num = $('#Number').val();
-                if (num.trim() == "") {
-                    myAlert('学号必填');
-                    return false;
-                }
-                $.post('@Url.Action("Search","Student")', { number: num }, function (data, status) {
-                    $('#students').html(data);
-                });
-            });
         });
-
-        function handlePage() {
-            $('#pager li').click(function () {
-                var pageNumber = $(this).attr('data-page');
-                getStudentdByPage(pageNumber);
-
-                $('#pager li').removeClass('active');
-                $(this).addClass('active');
+        
+        function toPage(url, param) {
+            $.get(url, param, function (data) {
+                $("#students").html(data);
+                bindPagerItems();
             });
         }
 
-        function getStudentdByPage(pageNumber) {
-            $.get('@Url.Action("GetStudents", "Student")',
-                { PageCount: 0, PageNumber: pageNumber, PageSize: 0, SearchName: '', SearchMajor: '', SearchGender: '', SearchNumber: '' },
-                function (data) {
-                    $('#students').html(data);
-                });
+        function bindPagerItems() {
+            $("#pager a").click(function () {
+                toPage($(this).attr("href"));
+                return false;
+            });
         }
-
 
         function showScore(id) {
             handleModal({
@@ -149,6 +140,19 @@
                 url: url,
                 submit: '保存'
             });
+        }
+
+        function onAddBegin() {
+            var canSubmit = false;
+
+            if ($("#gender").val() == "") {
+                toastr.warning("未指定性别");
+            } else if ($("#major").val() == "") {
+                toastr.warning("未指定专业");
+            } else {
+                canSubmit = true;
+            }
+            return canSubmit;
         }
 
         function onAddSuccess(d) {

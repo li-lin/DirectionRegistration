@@ -1,5 +1,9 @@
 ﻿@using DirectionRegistration.Models
-@model IList<StudentInfoViewModel>
+@using X.PagedList
+@using X.PagedList.Mvc
+
+@model IPagedList<StudentInfoViewModel>
+
 @foreach (StudentInfoViewModel d in Model)
 {
 <tr>
@@ -21,3 +25,8 @@
     </td>
 </tr>
 }
+<tr>
+    <td id="pager" colspan="5">
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("GetStudents", new { page, gender = ViewBag.Gender, major = ViewBag.Major }))
+    </td>
+</tr>

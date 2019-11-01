@@ -15,13 +15,6 @@ namespace DirectionRegistration.Web.Controllers
     public class ScoreController : Controller
     {
         private readonly RegistrationDbContext db = new RegistrationDbContext();
-        //
-        // GET: /Score/
-
-        public ActionResult Index()
-        {
-            return View();
-        }
 
         /// <summary>
         /// 生成录取结果的Excel文件
@@ -110,7 +103,6 @@ namespace DirectionRegistration.Web.Controllers
                 }
                 connection.Close();
             }
-            //return File(path, "application/vnd.ms-excel", System.IO.Path.GetFileName(path));
             return Content($"/Content/DownloadFiles/{System.IO.Path.GetFileName(path)}");
         }       
 

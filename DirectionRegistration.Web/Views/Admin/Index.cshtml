@@ -1,6 +1,5 @@
 ﻿@using DirectionRegistration.Models
-@using PagedList.Mvc;
-@model PagedList.IPagedList<RegistrationViewModel>
+@model IList<RegistrationViewModel>
 @{
     ViewBag.Title = "管理面板";
 }
@@ -70,15 +69,6 @@
                 }
             </tbody>
         </table>
-        <div>
-            第@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)页-共 @Model.PageCount 页
-            @Html.PagedListPager(Model,
-            page => Url.Action("Index", "Admin",
-                new
-                {
-                    page = page
-                }))
-        </div>
     </div>
 </div>
 

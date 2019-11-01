@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data;
 using System.Data.OleDb;
+using X.PagedList;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
@@ -15,30 +16,37 @@ namespace DirectionRegistration.Web.Controllers
     [SuperCheck]
     public class StudentController : Controller
     {
-        private RegistrationDbContext db = new RegistrationDbContext();
+        private readonly RegistrationDbContext db = new RegistrationDbContext();
         //
         // GET: /Stuent/
 
         public ActionResult Index()
+        {            
+            ViewBag.Majors = GetMajorSelectionItems();
+            return View();
+        }
+
+        private List<SelectListItem> GetMajorSelectionItems()
         {
-            StudentInfoViewModel model = new StudentInfoViewModel();
-            List<SelectListItem> majorList = new List<SelectListItem>();
-            foreach(string s in GetMajors())
+            List<SelectListItem> majorList = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Selected = true,
+                    Text = "未选择",
+                    Value = ""
+                }
+            };
+            foreach (string s in GetMajors())
             {
                 majorList.Add(new SelectListItem
                 {
-                    Selected = true,
+                    Selected = false,
                     Text = s,
                     Value = s
                 });
             }
-            ViewBag.Majors = majorList;
-
-            var pageInfo = GetPageInfo(0);
-            ViewBag.PageNumber = pageInfo.PageNumber;
-            ViewBag.PageCount = pageInfo.PageCount;
-
-            return View(model);
+            return majorList;
         }
 
         [HttpPost]
@@ -58,7 +66,7 @@ namespace DirectionRegistration.Web.Controllers
                 int i = db.SaveChanges();
                 if (i > 0)
                 {
-                    return PartialView("PartialStudentList", BindStudentsViewModel(GetPageInfo(0)));
+                    return GetAllStudentsView();
                 }
                 else
                 {
@@ -70,34 +78,44 @@ namespace DirectionRegistration.Web.Controllers
                 return Json(new { code = 1, data = "该学生已存在" });
             }
         }
-
-        [HttpPost]
-        public ActionResult Search(string number)
-        {
-            List<StudentInfoViewModel> data = new List<StudentInfoViewModel>();
-            if (!string.IsNullOrEmpty(number))
-            {
-                var students = db.Students.Where(item => item.Number == number).ToList();
-                foreach (var s in students)
-                {
-                    data.Add(new StudentInfoViewModel
-                    {
-                        Id = s.Id,
-                        Number = s.Number,
-                        Name = s.Name,
-                        Gender = s.Gender,
-                        Major = s.Major
-                    });
-                }
-            }
-            return PartialView("PartialStudentList", data); 
-        }
        
-        public ActionResult GetStudents(PagedStudentsViewModel model)
+        public ActionResult GetStudents(int? page, string gender, string major, string number, string name)
         {
-            List<StudentInfoViewModel> data = null;
-            data = BindStudentsViewModel(GetPageInfo(model.PageNumber));
-            return PartialView("PartialStudentList", data);
+            int pageSize = 18;
+            var students = db.Students.Select(s => new StudentInfoViewModel
+            {
+                Id = s.Id,
+                Number = s.Number,
+                Name = s.Name,
+                Gender = s.Gender,
+                Major = s.Major
+            });
+
+            if (String.IsNullOrEmpty(gender) == false)
+            {
+                students = students.Where(s => s.Gender == gender);
+                ViewBag.Gender = gender;
+            }
+            if (String.IsNullOrEmpty(major) == false)
+            {
+                students = students.Where(s => s.Major == major);
+                ViewBag.Major = major;
+            }
+            if (String.IsNullOrEmpty(number) == false)
+            {
+                students = students.Where(s => s.Number == number);
+            }
+            if (String.IsNullOrEmpty(name) == false)
+            {
+                students = students.Where(s => s.Name == name);
+            }
+
+            return PartialView("PartialStudentList", students.OrderBy(s=>s.Number).ToPagedList(page ?? 1, pageSize));
+        }
+
+        private ActionResult GetAllStudentsView()
+        {
+            return GetStudents(1, null, null, null, null);
         }
 
         [HttpPost]
@@ -119,7 +137,7 @@ namespace DirectionRegistration.Web.Controllers
                     return Json(new { code = 1, data = "删除失败" });
                 }
             }
-            return PartialView("PartialStudentList", BindStudentsViewModel(GetPageInfo(0)));
+            return GetAllStudentsView();
         }
 
         [HttpGet]
@@ -161,7 +179,7 @@ namespace DirectionRegistration.Web.Controllers
                 _student.Gender = student.Gender;
                 _student.Major = student.Major;
                 db.SaveChanges();
-                return PartialView("PartialStudentList", BindStudentsViewModel(GetPageInfo(0)));
+                return GetAllStudentsView();
             }
             return Json(new { code = 1, data = "修改失败" });
         }
@@ -260,9 +278,9 @@ namespace DirectionRegistration.Web.Controllers
                             //return 2;//2：数据重复
                             continue;
                         }
-                        this.db.Students.Add(s);
+                        db.Students.Add(s);
                     }
-                    int i = this.db.SaveChanges();
+                    int i = db.SaveChanges();
                     if (i > 0) result = 1; //1：成功
                 }
             }
@@ -272,7 +290,7 @@ namespace DirectionRegistration.Web.Controllers
         private bool CheckStudentExist(string number)
         {
             bool r = false;
-            int ss = this.db.Students.Count(s => s.Number == number);
+            int ss = db.Students.Count(s => s.Number == number);
             if (ss != 0) r = true;
             return r;
         }
@@ -280,43 +298,6 @@ namespace DirectionRegistration.Web.Controllers
         private List<String> GetMajors()
         {
             return db.Students.Select(s => s.Major).Distinct().ToList();
-        }
-
-        private PagedStudentsViewModel GetPageInfo(int pageNumber)
-        {
-            int all = db.Students.Count();
-            int pageSize = 18;
-            return new PagedStudentsViewModel
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                PageCount = (int)Math.Ceiling(Convert.ToDecimal(all / pageSize))
-            };
-        }
-
-        private List<StudentInfoViewModel> BindStudentsViewModel(int? pageNumber,int pageSize=20)
-        {
-            int pageNum = pageNumber ?? 0;
-            var students = db.Students.OrderBy(s => s.Number).Skip(pageNum * pageSize).Take(pageSize).ToList();
-
-            List<StudentInfoViewModel> model = new List<StudentInfoViewModel>();
-            foreach (var s in students)
-            {
-                model.Add(new StudentInfoViewModel
-                {
-                    Id = s.Id,
-                    Number = s.Number,
-                    Name = s.Name,
-                    Gender = s.Gender,
-                    Major = s.Major
-                });
-            }
-            return model;
-        }
-
-        private List<StudentInfoViewModel> BindStudentsViewModel(PagedStudentsViewModel arg)
-        {
-            return BindStudentsViewModel(arg.PageNumber, arg.PageSize);
-        }
+        }      
     }
 }

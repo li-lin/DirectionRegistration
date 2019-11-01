@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using CompareAttribute = System.Web.Mvc.CompareAttribute;
 
 namespace DirectionRegistration.Models
 {

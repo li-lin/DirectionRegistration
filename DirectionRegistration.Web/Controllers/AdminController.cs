@@ -7,7 +7,6 @@ using System.Data;
 using System.Data.OleDb;
 using System.IO;
 using System.Text;
-using PagedList;
 using DirectionRegistration.Repository;
 using DirectionRegistration.Repository.Entities;
 using DirectionRegistration.Models;
@@ -83,7 +82,7 @@ namespace DirectionRegistration.Web.Controllers
             ViewBag.TeacherInfo = teacher.LoginName + " | " + teacher.Name;
             int pageSize = 20;
             int pageNumber = (page ?? 1);
-            return View(registrations.ToPagedList(pageNumber, pageSize));
+            return View(registrations);
         }
 
         [LoginCheck]
