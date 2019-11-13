@@ -1,29 +1,29 @@
 ﻿@model DirectionRegistration.Models.StudentInfoViewModel
-    @using (Ajax.BeginForm("Modify", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onModifySuccess", LoadingElementId = "loading" }, new { @class = "form" }))
-    {
-        <div class="form-group">
-            <label for="Number">学号</label>
-            @Html.TextBoxFor(model => model.Number, new { @class = "form-control", placeholder = "学号" })
-        </div>
-        <div class="form-group">
-            <label for="Name">姓名</label>
-            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "姓名" })
-        </div>
-        <div class="form-group">
-            <label for="Gender">性别</label>
-            @Html.DropDownList("Gender", new List<SelectListItem>() {
-           new SelectListItem {
-               Text ="男",
-               Selected =false,
-               Value ="男"},
-           new SelectListItem { Text = "女",
-               Selected = true,
-               Value = "女" } }, new { @class = "form-control" })
-        </div>
-        <div class="form-group">
-            <label for="Major">专业</label>
-            @Html.DropDownListFor(model => model.Major, ViewBag.Majors as List<SelectListItem>, new { @class = "form-control" })
-        </div>
-    }
+@using (Ajax.BeginForm("Modify", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "onModifySuccess", LoadingElementId = "loading" }, new { @class = "form" }))
+{
+    <div class="form-group">
+        <label for="Number">学号</label>
+        @Html.TextBoxFor(model => model.Number, new { @class = "form-control", placeholder = "学号" })
+    </div>
+    <div class="form-group">
+        <label for="Name">姓名</label>
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "姓名" })
+    </div>
+    <div class="form-group">
+        <label for="Gender">性别</label>
+        @Html.DropDownList("Gender", new List<SelectListItem>() {
+        new SelectListItem {
+            Text ="男",
+            Selected =false,
+            Value ="男"},
+        new SelectListItem { Text = "女",
+            Selected = true,
+            Value = "女" } }, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        <label for="Major">专业</label>
+        @Html.DropDownListFor(model => model.Major, ViewBag.Majors as List<SelectListItem>, new { @class = "form-control" })
+    </div>
+}
 
 

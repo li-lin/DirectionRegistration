@@ -33,7 +33,7 @@
                         loading.hide();                       
                         if (data.code == "101") {
                             toastr.success(data.msg);
-                            window.location.href = "@Url.Action("Index", "Student", new { ssid = Guid.NewGuid().ToString() })";
+                            window.location.href = "@Url.Action("Index", "Student")";
                         } else {
                             toastr.warning(data.msg);
                         }

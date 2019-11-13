@@ -1,5 +1,9 @@
 ﻿@using DirectionRegistration.Models
-@model IList<StudentInfoViewModel>
+@using X.PagedList
+@using X.PagedList.Mvc
+
+@model IPagedList<StudentInfoViewModel>
+
 @foreach (StudentInfoViewModel d in Model)
 {
 <tr>
@@ -17,6 +21,12 @@
                      new { Id = d.Id },
                      new AjaxOptions() { HttpMethod="POST", OnSuccess= "onRePasswordSuccess", LoadingElementId = "loading", Confirm = "确定要重置密码吗？" },
                      new { @class = "btn btn-danger" })
+        <button onclick="showScore('@d.Id')" class="btn btn-primary" data-toggle="modal" data-target="#myModal">成绩详情</button>
     </td>
 </tr>
 }
+<tr>
+    <td id="pager" colspan="5">
+        @Html.PagedListPager((IPagedList)Model, page => Url.Action("GetStudents", new { page, gender = ViewBag.Gender, major = ViewBag.Major }))
+    </td>
+</tr>

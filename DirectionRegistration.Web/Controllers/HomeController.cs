@@ -40,7 +40,7 @@ namespace DirectionRegistration.Controllers
                         Id = d.Id,
                         DirectionName = d.Title,
                         Order = ++order
-                    });
+                    });                    
                 });
             }
             else
@@ -59,10 +59,23 @@ namespace DirectionRegistration.Controllers
                     });
                 }
             }
+
+            foreach(var dinfo in model.Directions)
+            {
+                dinfo.CourseInfo = db.DirectionCourses
+                    .Where(dc => dc.Direction.Id == dinfo.Id)
+                    .Select(dc => dc.Course.CourseName)
+                    .ToList();
+            }
                       
             ViewBag.IsOverTime = IsTimeOver;
             ViewBag.Deadline = Deadline;
             return View(model);
+        }
+
+        public ActionResult GetRolePage()
+        {
+            return PartialView("PartialTheRoles");
         }
 
         [HttpPost]
@@ -277,7 +290,7 @@ namespace DirectionRegistration.Controllers
                 {
                     deadline = config.Deadline;
                 }
-                string d = $"{deadline.Year}年{deadline.Month}月{deadline.Day}日{deadline.Hour}时{deadline.Minute}分{deadline.Second}秒";
+                string d = $"{deadline.Year}年{deadline.Month}月{deadline.Day}日{deadline.Hour}时{deadline.Minute}分";
                 return d;
             }
         }

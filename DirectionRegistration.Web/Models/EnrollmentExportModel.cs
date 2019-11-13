@@ -5,9 +5,9 @@ using System.Web;
 
 namespace DirectionRegistration.Models
 {
-    public class EnrollmentViewModel
+    public class EnrollmentExportModel
     {
-        public EnrollmentViewModel()
+        public EnrollmentExportModel()
         {
             Scores = new List<ScoreInfoViewModel>();
         }

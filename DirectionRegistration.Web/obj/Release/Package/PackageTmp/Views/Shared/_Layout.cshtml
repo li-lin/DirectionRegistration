@@ -13,15 +13,24 @@
             padding-top:50px;
             font-size:16px;
         }
+        .form-width-auto{
+            width:auto;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
+        <div class="container-fluid">
             <div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
                 @Html.ActionLink("计算机与软件学院方向志愿填报平台", "Index", "Home", null, new { @class = "navbar-brand" })
             </div>
-            <div class="collapse navbar-collapse">
+            <div class="collapse navbar-collapse"  id="navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     @if (Session["admin"] != null && Session["admin"].ToString() != string.Empty)
                     {
@@ -32,12 +41,12 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">系统管理<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <li>@Html.ActionLink("学生设置", "Index", "Student")</li>
-                                    <li>@Html.ActionLink("教师设置", "Index", "Teacher")</li>
+                                    <li>@Html.ActionLink("课程设置", "Index", "Course")</li>
                                     <li>@Html.ActionLink("方向设置", "Index", "Direction")</li>
-                                    @*<li>@Html.ActionLink("课程设置", "Index", "Course")</li>*@
+                                    <li>@Html.ActionLink("教师设置", "Index", "Teacher")</li>
                                     <li role="separator" class="divider"></li>
                                     <li><a href="#" id="btn-settings" data-remote="false" data-toggle="modal" data-target="#myModal">参数设置</a></li>
-                                    <li> @Html.ActionLink("导出志愿", "DownloadData", "Admin")</li>
+                                    <li>@Html.ActionLink("导出志愿", "DownloadData", "Admin")</li>
                                 </ul>
                             </li>
                         }
@@ -98,6 +107,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             toastr.options.positionClass = 'toast-top-center';
+            toastr.options.timeOut = 1000;
             var path = location.pathname;
             var navs = $('ul.navbar-nav li');
             for (var i = 0; i < navs.length; i++) {
@@ -126,7 +136,7 @@
                     var btn = modal.find('#btn-save');
                     if (s && s == "保存") {
                         btn.show();
-                        btn.text(s).click(function () {
+                        btn.text(s).one("click",function () {
                             modal.find('form').submit();
                         });
                     } else if (s == "导入") {
@@ -141,6 +151,8 @@
                 }
             }).on('hidden.bs.modal', function (e) {
                 var modal = $(this);
+                var btn = modal.find('#btn-save');
+                btn.off("click");
                 modal.find('.modal-title').empty();
                 modal.find('.modal-body').empty();
                 modal.attr('cust-title', '');

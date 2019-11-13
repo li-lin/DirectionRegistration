@@ -11,8 +11,8 @@ namespace DirectionRegistration.Repository
     {
         public RegistrationDbContext()
         {
-            //Database.SetInitializer(new ProductionLevelInitialization());  
-            Database.SetInitializer(new RegistrationDbInitialization());            
+            //Database.SetInitializer(new ProductionLevelInitialization());
+            Database.SetInitializer(new RegistrationDbInitialization());
         }
         public DbSet<Student> Students { get; set; }
         public DbSet<Direction> Directions { get; set; }

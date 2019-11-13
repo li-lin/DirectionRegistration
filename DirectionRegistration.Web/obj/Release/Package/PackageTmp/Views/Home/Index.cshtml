@@ -5,30 +5,34 @@
 }
 
 <div class="page-header">
-    <h3>方向填报 - [@Model.Name : @Model.Number]</h3>
+    <h3>方向填报 - [@Model.Name : @Model.Number]<span class="label label-danger pull-right">截止时间：@ViewBag.Deadline</span></h3>
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">方向列表<span class="pull-right text-danger"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>通过鼠标拖动进行排序，以确定方向志愿的先后顺序。</span></h3>
+        <h3 class="panel-title">方向列表<span class="pull-right" style="color:red;"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>拖动鼠标进行排序，以确定志愿顺序。</span></h3>
     </div>
     <div class="panel-body">
         <div class="col-sm-6 col-sm-offset-3">
-            <ul id="dlist" style="padding:0px;font-weight:bold;font-size:1.0em;" class="list-group">
+            <ul id="dlist" style="padding:0px;font-weight:bold;" class="list-group">
                 @{
                     foreach (var item in Model.Directions)
                     {
-                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer"><span class="badge pull-left" style="background-color:brown">@item.Order</span>@item.DirectionName</li>
+                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer;" data-courses="@String.Join(" | ", item.CourseInfo.ToArray())">
+                            <span class="badge pull-left" style="background-color:brown;margin-right:6px;">@item.Order</span>
+                            <p style="font-size:1em;">@item.DirectionName</p>
+                        </li>
                     }
                 }
             </ul>
             @{
                 if ((bool)ViewBag.IsOverTime)
                 {
-                    <button type="button" class="btn btn-primary btn-block btn-lg disabled">保存（填报结束）</button>
+                    <button type="button" class="btn btn-default btn-block btn-lg disabled">志愿填报结束</button>
                 }
                 else
                 {
-                    <button id="btn-ok" type="button" class="btn btn-primary btn-block btn-lg">保存</button>
+                    <span><input type="checkbox" id="confirm" />我已认真阅读<a href="#" class="btn-link" data-toggle="modal" data-target="#myModal" id="therole">《志愿填报方法与录取规则》</a>，并决定<span class="text-danger" style="font-weight:bold;">按以上顺序</span>填报方向志愿。</span>
+                    <button id="btn-ok" type="button" class="btn btn-primary btn-block btn-lg">确认志愿</button>
                 }
             }
         </div>
@@ -38,11 +42,11 @@
 @section scripts{
     <script src="~/Scripts/Sortable.js"></script>
     <script type="text/javascript">
-        $(document).ready(function () {   
+        $(document).ready(function () {
             prepareSortable();
 
             $('#btn-ok').click(function () {
-                var b = confirm('请确认你的方向志愿填报?');
+                var b = confirm('请再次确认是否按照以下志愿顺序填报方向志愿?');
                 if (b) {
                     var udata = getValues();
                     $.ajax({
@@ -59,12 +63,30 @@
                             }
                         }
                     });
-                }                
+                }
+            }).hide();
+
+            $('#confirm').click(function () {
+                var btn = $('#btn-ok');
+                if (this.checked) {
+                    btn.show();
+                } else {
+                    btn.hide();
+                }
+            });
+
+            $('#therole').click(function () {
+                handleModal({
+                    title: this.innerText,
+                    url: '@Url.Action("GetRolePage", "Home")'
+                });
+                event.returnValue = false;
             });
         });
 
         function prepareSortable() {
             var list = document.getElementById('dlist');
+            freshOrders();
             Sortable.create(list, {
                 onEnd: function (evt) {
                     freshOrders();
@@ -73,8 +95,23 @@
         }
 
         function freshOrders() {
-            var orders = $('#dlist span');            
+            var orders = $('#dlist span');
             for (var i = 0; i < orders.length; i++) {
+                var $li = $(orders[i]).parent('li');
+                if (i == 0) {
+                    var info = $li.attr('data-courses');
+                    if (info.split("|").length > 3) {
+                        $li.attr('title', '考核科目（取最高4门）：' + info);
+                    } else {
+                        $li.attr('title', '考核科目：' + info);
+                    }
+                    orders[i].style.backgroundColor = "green";
+                    orders[i].parentElement.style.borderColor = "green";
+                } else {
+                    $li.attr('title', '')
+                    orders[i].style.backgroundColor = "brown";
+                    orders[i].parentElement.style.borderColor = "brown";
+                }
                 orders[i].innerHTML = i + 1;
             }
         }
@@ -93,6 +130,6 @@
             value.Orders = orders;
             return value;
         }
-        
+
     </script>
 }

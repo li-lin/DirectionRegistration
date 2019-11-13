@@ -10,5 +10,6 @@ namespace DirectionRegistration.Models
         public int Id { get; set; }
         public string DirectionName { get; set; }
         public int Order { get; set; }
+        public List<string> CourseInfo { get; set; }
     }
 }

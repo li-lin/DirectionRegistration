@@ -59,6 +59,7 @@ D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\EntityFramework.
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\EntityFramework.SqlServer.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\Microsoft.Web.Infrastructure.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\Newtonsoft.Json.dll
+D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\NPOI.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Net.Http.Formatting.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Text.Encodings.Web.dll
 D:\Projects\DirectionRegistration\DirectionRegistration.Web\bin\System.Web.Helpers.dll

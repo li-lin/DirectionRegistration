@@ -1,0 +1,29 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc
+
+@model IPagedList<DirectionRegistration.Models.RegistrationViewModel>
+
+@foreach (var r in Model)
+{
+    <tr>
+        <td><span style="display:none">@r.Id</span>@r.Number</td>
+        <td>@r.Name</td>
+        <td>@r.Gender</td>
+        <td>@r.Major</td>
+        <td>@r.FirstSelection</td>
+        <td>@(String.IsNullOrEmpty(r.EnrollDirection) ? "##" : r.TotalScore.ToString())</td>
+        <td>@(String.IsNullOrEmpty(r.EnrollDirection) ? "未录取" : r.EnrollDirection + "(" + r.EnrolledOrder + ")")</td>
+        <td>@(String.IsNullOrEmpty(r.EnrollDirection) ? "##" :(r.WhichTime == 0 ? "提前批" : "第" + r.WhichTime + "批"))</td>
+        <td>@(String.IsNullOrEmpty(r.EnrollDirection) ? "##" : r.OrderInDirection.ToString())</td>
+        <td>
+            <button onclick="showDetail('@r.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">详情</button>
+        </td>
+    </tr>
+}
+<tr>
+    <td id="pager" colspan="10" data-regs="@ViewBag.Regs" data-enrolls="@ViewBag.Enrolls">
+        @Html.PagedListPager((IPagedList)Model, 
+       page => Url.Action("GetEnrollments", 
+       new { page, direction = ViewBag.EnrollDirection, whichtime = ViewBag.WhichTime, firstwish=ViewBag.FirstSelection}))
+    </td>
+</tr>

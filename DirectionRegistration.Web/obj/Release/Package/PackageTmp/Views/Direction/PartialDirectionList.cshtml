@@ -2,16 +2,21 @@
 @model IList<DirectionViewModel>
 @foreach (DirectionViewModel d in Model)
 {
-<tr>
-    <td class="col-md-3">@d.Title</td>
-    <td class="col-md-3">@d.Max</td>
-    <td class="col-md-3">@d.TeacherName</td>
-    <td class="col-md-3">
-        <button onclick="showModify('@d.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">修改</button>
-        @Ajax.ActionLink("删除", "Delete",
-            new { Id = d.Id },
-            new AjaxOptions() {HttpMethod="POST", OnSuccess= "onDelSuccess", LoadingElementId = "loading", Confirm="确定要删除吗？"},
-            new { @class = "btn btn-warning" })
-    </td>
-</tr>
+    <tr>
+        <td class="col-md-2">@d.Title</td>
+        <td class="col-md-2">@d.Max</td>
+        <td class="col-md-6">
+            @foreach (var c in d.Courses)
+            {
+                <span style="font-weight:bold;">@c.CourseName<span class="badge" style="background-color:deepskyblue;">@c.Proportion</span></span>
+            }
+        </td>
+        <td class="col-md-2">
+            <button onclick="showModify('@d.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">修改</button>
+            @Ajax.ActionLink("删除", "Delete",
+                new { Id = d.Id },
+                new AjaxOptions() { HttpMethod = "POST", OnSuccess = "onDelSuccess", LoadingElementId = "loading", Confirm = "确定要删除吗？" },
+                new { @class = "btn btn-warning" })
+        </td>
+    </tr>
 }

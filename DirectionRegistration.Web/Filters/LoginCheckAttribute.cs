@@ -14,9 +14,6 @@ namespace DirectionRegistration.Web.Filters
             string currentAdmin = filterContext.HttpContext.Session["admin"] as string;
             if (string.IsNullOrEmpty(currentStu) && string.IsNullOrEmpty(currentAdmin))
             {
-                //HttpContext.Current.Response.Write("<script>window.parent.location.href='/Home/Login'</script>");
-                //HttpContext.Current.Response.End();
-                //return;
                 filterContext.Result = new RedirectResult("~/Home/Quit");
             }
         }

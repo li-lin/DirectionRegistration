@@ -8,65 +8,87 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">管理员 - [@ViewBag.TeacherInfo]
-            <span class="label label-primary pull-right" style="font-size:1.1em;">
-                已填报[<span style="color:brown">@ViewBag.DirName</span>] @ViewBag.Now / @ViewBag.All 
-            </span>
+        <h3 class="panel-title">
+            管理员 - [@ViewBag.TeacherInfo]
         </h3>
     </div>
     <div class="panel-body">
-        @Html.ActionLink("方向录取", "GenerateResult","Score", null, new { id = "btn-export-result", @class = "btn btn-success", title = "使用成绩优先算法，成绩高者先录取。" })
-        @Ajax.ActionLink("方向录取Ajax", "GenerateResult", "Score", null, new AjaxOptions { LoadingElementId = "loading", OnSuccess="exported_excel" }, new { id = "btn-export-result", @class = "btn btn-success", title = "使用成绩优先算法，成绩高者先录取。" })
-        <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="form-group col-md-2">
+                <label for="number">学号</label>
+                <input id="number" type="text" class="form-control" placeholder="学号" />
+            </div>
+            <div class="form-group col-md-2">
+                <label for="name">姓名</label>
+                <input id="name" type="text" class="form-control" placeholder="姓名" />
+            </div>
+            <div class="form-group col-md-2">
+                <label for="first-wish">第一志愿</label>
+                @Html.DropDownList("FirstWish", ViewBag.Directions as List<SelectListItem>,
+                    new { id = "first-wish", @class = "form-control" })
+            </div>
+            <div class="form-group col-md-2">
+                <label for="enrolled">录取方向</label>
+                @Html.DropDownList("Enrolled", ViewBag.Directions as List<SelectListItem>,
+                    new { id = "enrolled", @class = "form-control" })
+            </div>
+            <div class="form-group col-md-2">
+                <label for="which-time">录取批次</label>
+                @Html.DropDownList("WhichTime", ViewBag.WhichTimes as List<SelectListItem>,
+                    new { id = "which-time", @class = "form-control" })
+            </div>
+            <div class="form-group col-md-1">
+                <img id="loading" style="display:none;" src="~/Content/Images/loading.gif" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-inline">
+                <div class="form-group col-md-6 col-md-push-3">
+                    @Html.ActionLink("提前批录取", "EnrollBest", null, new { id = "btn-import", @class = "btn btn-primary" })
+                    @Html.ActionLink("第1志愿录取", "EnrollFirst", "Admin", null,
+                        new { id = "btn-export-result", @class = "btn btn-primary" })
+                    @Html.ActionLink("第2志愿录取", "EnrollSecond", "Admin", null,
+                        new { id = "btn-export-result", @class = "btn btn-primary" })
+                    @Html.ActionLink("手动录取", "EnrollManual", "Admin", null,
+                        new { id = "btn-export-result", @class = "btn btn-primary" })
+                    @Ajax.ActionLink("导出", "GenerateResult", "Score", null,
+                        new AjaxOptions { LoadingElementId = "loading", OnSuccess = "exported_excel" },
+                        new { id = "btn-export-result", @class = "btn btn-success" })
+                    <a href="#" class="btn btn-primary" id="btn-search" title="按学号">搜索</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">志愿信息</h3>
+        <h3 class="panel-title">
+            志愿信息
+            [<span id="reg-count">@ViewBag.Regs</span> / @ViewBag.All]
+            <span class="label label-primary pull-right" style="font-size:1em;">
+                录取情况[<span id="enroll-count">@ViewBag.Enrolls</span> / @ViewBag.All]
+            </span>
+        </h3>
     </div>
     <div class="panel-body">
-        <table class="table table-striped"> 
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>学号</th>
-                    <th>姓名</th>
-                    <th>性别</th>
-                    <th>专业</th>
-                    <th>第1志愿</th>
-                    <th>第2志愿</th>
-                    <th>第3志愿</th>
-                    <th>第4志愿</th>
-                    <th>第5志愿</th>
-                    <th>操作</th>
+                    <th class="col-md-1">学号</th>
+                    <th class="col-md-1">姓名</th>
+                    <th class="col-md-1">性别</th>
+                    <th class="col-md-1">专业</th>
+                    <th class="col-md-2">第一志愿</th>
+                    <th class="col-md-1">考核成绩</th>
+                    <th class="col-md-2">录取方向(志愿序号)</th>
+                    <th class="col-md-1">录取批次</th>
+                    <th class="col-md-1">排名</th>
+                    <th class="col-md-1">操作</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @item.Number
-                        </td>
-                        <td>
-                            @item.Name
-                        </td>
-                        <td>
-                            @item.Gender
-                        </td>
-                        <td>
-                            @item.Major
-                        </td>
-                        @foreach (var dir in item.Selections)
-                        {
-                            <td>
-                                @dir.DirectionName
-                            </td>
-                        }
-                        <td>
-                            <button onclick="showDetail('@item.Id')" class="btn btn-default" data-toggle="modal" data-target="#myModal">详情</button>
-                        </td>
-                    </tr>
-                }
+            <tbody id="enrollments">
+                @Html.Action("GetEnrollments", "Admin")
             </tbody>
         </table>
     </div>
@@ -76,12 +98,34 @@
     <script>
         function showDetail(id) {
             handleModal({
-                title: '填报详情',
+                title: '志愿详情',
                 url: '@Url.Action("Details","Admin")' + '/' + id
             });
         }
 
+        function toPage(url, param) {
+            var loading = $("#loading");
+            loading.show();
+            $.get(url, param, function (data) {
+                $("#enrollments").html(data);
+                var pager = $("#pager");
+                var regs = pager.attr("data-regs");
+                var enrolls = pager.attr("data-enrolls");
+                $("#reg-count").html(regs);
+                $("#enroll-count").html(enrolls);
+                bindPagerItems();
+                loading.hide();
+            });
+        }
 
+        function bindPagerItems() {
+            $("#pager a").click(function () {
+                toPage($(this).attr("href"));
+                return false;
+            });
+        }
+
+        //export ajax onsuccess
         function exported_excel(data) {
             var hidden_link = document.createElement('a');
             hidden_link.style.display = "none";
@@ -91,5 +135,41 @@
             hidden_link.click();
             document.body.removeChild(hidden_link);
         }
+
+        $(document).ready(function() {
+            bindPagerItems();
+
+            $("#btn-search").click(function () {
+                var firstwish = $("#first-wish").val();
+                var enrolled = $("#enrolled").val();
+                var whichtime = $("#which-time").val();
+                var name = $("#name").val();
+                var number = $("#number").val();
+                var url = '@Url.Action("GetEnrollments", "Admin")';
+                var param = {
+                    firstwish: firstwish,
+                    direction: enrolled,
+                    whichtime: whichtime,
+                    number: number,
+                    name: name
+                };
+                toPage(url, param);
+                return false;
+            });
+
+            $("#btn-import").click(function () {
+                var number = $("#number").val();
+                var url = '@Url.Action("EnrollBest", "Admin")';
+                var param = { number: number };
+                toPage(url, param);
+                return false;
+            });
+
+            $("#btn-export-result").click(function () {
+                var url = '@Url.Action("Enroll", "Admin")';
+                toPage(url, null);
+                return false;
+            })
+        });
     </script>
 }

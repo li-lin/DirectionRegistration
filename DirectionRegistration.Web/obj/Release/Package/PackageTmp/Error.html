@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>错误</title>
+</head>
+<body>
+    <hgroup>
+        <h1>错误</h1>
+        <h2>处理你的请求时出错。<span id="time" style="color:red">5</span>秒钟后跳转到登录页，请重新登录再试。如果无法解决，请联系管理员。</h2>
+    </hgroup>
+    <script>
+        window.onload = function () {
+            var time = document.getElementById('time');
+            var num = 5;
+            var timer = setInterval(function () {
+                time.innerHTML = (--num);
+                if (num == 0) {
+                    clearInterval(timer);
+                    window.location.href = 'Home/Login';
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

@@ -110,7 +110,8 @@ namespace DirectionRegistration.Web.Controllers
                 students = students.Where(s => s.Name == name);
             }
 
-            return PartialView("PartialStudentList", students.OrderBy(s=>s.Number).ToPagedList(page ?? 1, pageSize));
+            return PartialView("PartialStudentList", 
+                students.OrderBy(s=>s.Number).ToPagedList(page ?? 1, pageSize));
         }
 
         private ActionResult GetAllStudentsView()

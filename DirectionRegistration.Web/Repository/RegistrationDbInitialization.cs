@@ -70,7 +70,7 @@ namespace DirectionRegistration.Repository
 
             var config = new ServerConfig()
             {
-                Deadline = new DateTime(2018, 7, 30),
+                Deadline = DateTime.Now.AddDays(30),
                 EnrollmentState = 0
             };
             context.ServerConfigurations.Add(config);

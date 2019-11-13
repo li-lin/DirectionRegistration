@@ -12,6 +12,7 @@ namespace DirectionRegistration.Repository.Entities
         {
             Scores = new List<Score>();
             DirectionCourse = new List<DirectionCourse>();
+            Enrollments = new List<Enrollment>();
         }
         /// <summary>
         /// 课程ID
@@ -25,6 +26,8 @@ namespace DirectionRegistration.Repository.Entities
         public virtual List<Score> Scores { get; set; }
 
         public virtual List<DirectionCourse> DirectionCourse { get; set; }
+
+        public virtual List<Enrollment> Enrollments { get; set; }
 
     }
 }

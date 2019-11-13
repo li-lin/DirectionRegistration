@@ -1,10 +1,11 @@
-﻿@model DirectionRegistration.Models.RegistrationViewModel
+﻿@model DirectionRegistration.Models.RegEnrollDetailViewModel
 
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">学生信息</h3>
     </div>
     <div class="panel-body">
+        <span class="label label-default">@Model.Number</span>
         <span class="label label-primary">@Model.Name</span>
         <span class="label label-success">@Model.Gender</span>
         <span class="label label-info">@Model.Major</span>
@@ -12,14 +13,49 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
+        <h3 class="panel-title">录取信息</h3>
+    </div>
+    <div class="panel-body">
+        @if (Model.EnrollDirection != "未录取")
+        {
+        <div>
+            <span class="label label-primary">@Model.EnrollDirection (@Model.EnrolledOrder)</span>
+            <span class="label label-default">@(Model.WhichTime == 0 ? "提前批" : "第" + Model.WhichTime + "批")</span>
+            <span class="label label-success">第 @Model.OrderInDirection 名</span>
+            <span class="label label-info">总成绩： @Model.TotalScore</span>
+        </div>            
+        <ul class="list-group">
+            @foreach (var item in Model.Scores)
+            {
+                <li class="list-group-item col-sm-6">
+                    <span class="badge" style="background-color:olivedrab">@item.ScoreValue</span>@item.ScoreName
+                </li>
+            }
+        </ul>
+        }
+        else
+        {
+            <h5>暂未录取</h5>
+        }
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
         <h3 class="panel-title">志愿信息</h3>
     </div>
     <div class="panel-body">
-        <ul class="list-group">
-            @foreach (var item in Model.Selections)
-            {
-                <li class="list-group-item col-sm-6"><span class="badge pull-left" style="background-color:olivedrab">@item.Order</span>@item.DirectionName</li>
-            }
-        </ul>
+        @if (Model.Selections.Count != 0)
+        {
+            <ul class="list-group">
+                @foreach (var item in Model.Selections)
+                {
+                    <li class="list-group-item col-sm-6"><span class="badge pull-left" style="background-color:olivedrab">@item.Order</span>@item.DirectionName</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <h5>暂未填报</h5>
+        }
     </div>
 </div>

@@ -17,7 +17,7 @@
                 @{
                     foreach (var item in Model.Directions)
                     {
-                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer;">
+                        <li data-id="@item.Id" class="list-group-item" style="cursor:pointer;" data-courses="@String.Join(" | ", item.CourseInfo.ToArray())">
                             <span class="badge pull-left" style="background-color:brown;margin-right:6px;">@item.Order</span>
                             <p style="font-size:1em;">@item.DirectionName</p>
                         </li>
@@ -27,10 +27,11 @@
             @{
                 if ((bool)ViewBag.IsOverTime)
                 {
-                    <button type="button" class="btn btn-primary btn-block btn-lg disabled">确认志愿（填报结束）</button>
+                    <button type="button" class="btn btn-default btn-block btn-lg disabled">志愿填报结束</button>
                 }
                 else
                 {
+                    <span><input type="checkbox" id="confirm" />我已认真阅读<a href="#" class="btn-link" data-toggle="modal" data-target="#myModal" id="therole">《志愿填报方法与录取规则》</a>，并决定<span class="text-danger" style="font-weight:bold;">按以上顺序</span>填报方向志愿。</span>
                     <button id="btn-ok" type="button" class="btn btn-primary btn-block btn-lg">确认志愿</button>
                 }
             }
@@ -45,7 +46,7 @@
             prepareSortable();
 
             $('#btn-ok').click(function () {
-                var b = confirm('是否确认提交?');
+                var b = confirm('请再次确认是否按照以下志愿顺序填报方向志愿?');
                 if (b) {
                     var udata = getValues();
                     $.ajax({
@@ -63,6 +64,23 @@
                         }
                     });
                 }
+            }).hide();
+
+            $('#confirm').click(function () {
+                var btn = $('#btn-ok');
+                if (this.checked) {
+                    btn.show();
+                } else {
+                    btn.hide();
+                }
+            });
+
+            $('#therole').click(function () {
+                handleModal({
+                    title: this.innerText,
+                    url: '@Url.Action("GetRolePage", "Home")'
+                });
+                event.returnValue = false;
             });
         });
 
@@ -79,9 +97,22 @@
         function freshOrders() {
             var orders = $('#dlist span');
             for (var i = 0; i < orders.length; i++) {
+                var $li = $(orders[i]).parent('li');
+                if (i == 0) {
+                    var info = $li.attr('data-courses');
+                    if (info.split("|").length > 3) {
+                        $li.attr('title', '考核科目（取最高4门）：' + info);
+                    } else {
+                        $li.attr('title', '考核科目：' + info);
+                    }
+                    orders[i].style.backgroundColor = "green";
+                    orders[i].parentElement.style.borderColor = "green";
+                } else {
+                    $li.attr('title', '')
+                    orders[i].style.backgroundColor = "brown";
+                    orders[i].parentElement.style.borderColor = "brown";
+                }
                 orders[i].innerHTML = i + 1;
-                orders[i].style.backgroundColor = "brown";
-                orders[i].parentElement.style.borderColor = "brown";
             }
         }
 

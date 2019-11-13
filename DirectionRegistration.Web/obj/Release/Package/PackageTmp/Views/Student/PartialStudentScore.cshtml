@@ -1,0 +1,19 @@
+﻿@model DirectionRegistration.Models.StudentScoreViewModel
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">学生 | <span class="text-primary" style="font-weight:bold;">[@Model.StudentName]</span></h3>
+    </div>
+    <div class="panel-body">
+        @if (Model.Total == 0)
+        {
+            <h4>该生无成绩信息</h4>
+        }
+        else
+        {
+            foreach (var item in Model.Scores)
+            {
+                <h4 class="col-md-6">@item.ScoreName<span class="badge" style="background-color:cornflowerblue;">@item.ScoreValue</span></h4>
+            }
+        }
+    </div>
+</div>

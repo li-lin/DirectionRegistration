@@ -25,7 +25,7 @@ namespace DirectionRegistration.Repository.Entities
         /// <summary>
         /// 学生是第几批次被录取，0为提前批，1为第一批（第一志愿），2为第二批（第二志愿及以后的平行志愿）
         /// </summary>
-        //[DefaultValue(-1)]
+        [DefaultValue(-1)]
         public int WhichTime { get; set; }
 
         public virtual List<Course> EnrollCourses { get; set; }
